@@ -31,11 +31,19 @@ export default function DetectionIA() {
   const tauxQualite = totalAnalyses > 0 ? ((totalConformes / totalAnalyses) * 100).toFixed(1) : '0'
 
  useEffect(() => {
-    socket.on('connect', () => setConnected(true))
-    socket.on('disconnect', () => setConnected(false))
+    // Initialiser l'état connecté si le socket est déjà actif au montage
+    if (socket.connected) setConnected(true)
 
-    // Écoute des alertes (Statut non_conforme)
-    socket.on('alerte_defaut', (data) => {
+    // Références nommées pour un nettoyage précis
+    const onConnect = () => setConnected(true)
+    const onDisconnect = () => setConnected(false)
+
+    const onAlerteDefaut = (data: {
+      id?: number
+      scoreConfiance?: number
+      typeDefaut?: string
+      ouvrier?: { prenom: string; nom: string; departement?: string }
+    }) => {
       console.log("Alerte reçue du backend:", data);
       
       const analyse = {
@@ -55,10 +63,14 @@ export default function DetectionIA() {
         message: `Défaut détecté : ${analyse.classe}`,
         heure: analyse.heure
       }, ...prev].slice(0, 5))
-    })
+    }
 
-    // Écoute de la production (Statut conforme)
-    socket.on('nouvelle_production', (data) => {
+    const onNouvelleProduction = (data: {
+      id?: number
+      statutIA?: string
+      scoreConfiance?: number
+      ouvrier?: { prenom: string; nom: string; departement?: string }
+    }) => {
       if (data.statutIA === 'conforme') {
         const analyse = {
           id: data.id || Date.now(),
@@ -73,13 +85,19 @@ export default function DetectionIA() {
         setAnalyses(prev => [analyse, ...prev].slice(0, 50))
         setDernierResultat(analyse)
       }
-    })
+    }
+
+    socket.on('connect', onConnect)
+    socket.on('disconnect', onDisconnect)
+    socket.on('alerte_defaut', onAlerteDefaut)
+    socket.on('nouvelle_production', onNouvelleProduction)
 
     return () => {
-      socket.off('connect')
-      socket.off('disconnect')
-      socket.off('alerte_defaut')
-      socket.off('nouvelle_production')
+      // Supprimer uniquement nos propres listeners
+      socket.off('connect', onConnect)
+      socket.off('disconnect', onDisconnect)
+      socket.off('alerte_defaut', onAlerteDefaut)
+      socket.off('nouvelle_production', onNouvelleProduction)
     }
   }, [])
   return (

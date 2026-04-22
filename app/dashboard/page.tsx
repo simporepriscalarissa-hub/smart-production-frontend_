@@ -92,21 +92,25 @@ export default function Dashboard() {
   useEffect(() => {
     fetchData()
 
+    // Initialiser l'état connecté si le socket est déjà actif au montage
+    if (socket.connected) setConnected(true)
+
     const pollingInterval = setInterval(() => {
       fetchData()
     }, 5000)
 
-    socket.on('connect', () => {
+    // Références nommées pour un nettoyage précis sans affecter les autres composants
+    const onConnect = () => {
       setConnected(true)
       addNotification('Connexion temps réel établie', 'success')
-    })
+    }
 
-    socket.on('disconnect', () => {
+    const onDisconnect = () => {
       setConnected(false)
       addNotification('Connexion temps réel perdue — polling actif', 'info')
-    })
+    }
 
-    socket.on('nouvelle_production', (production: Production) => {
+    const onNouvelleProduction = (production: Production) => {
       setProductions(prev => {
         const updated = [production, ...prev]
         calculerStats(updated)
@@ -121,23 +125,30 @@ export default function Dashboard() {
           : `${nom} — ${production.quantiteProduite} pièce(s) conformes`,
         production.quantiteNonConforme > 0 ? 'error' : 'success'
       )
-    })
+    }
 
-    socket.on('oee_update', (data: OEE) => {
+    const onOeeUpdate = (data: OEE) => {
       setOee(data)
-    })
+    }
 
-    socket.on('presence_ouvrier', (ouvrier) => {
+    const onPresenceOuvrier = (ouvrier: { prenom: string; nom: string }) => {
       addNotification(`${ouvrier.prenom} ${ouvrier.nom} a scanné son badge`, 'info')
-    })
+    }
+
+    socket.on('connect', onConnect)
+    socket.on('disconnect', onDisconnect)
+    socket.on('nouvelle_production', onNouvelleProduction)
+    socket.on('oee_update', onOeeUpdate)
+    socket.on('presence_ouvrier', onPresenceOuvrier)
 
     return () => {
       clearInterval(pollingInterval)
-      socket.off('connect')
-      socket.off('disconnect')
-      socket.off('nouvelle_production')
-      socket.off('oee_update')
-      socket.off('presence_ouvrier')
+      // Supprimer uniquement nos propres listeners
+      socket.off('connect', onConnect)
+      socket.off('disconnect', onDisconnect)
+      socket.off('nouvelle_production', onNouvelleProduction)
+      socket.off('oee_update', onOeeUpdate)
+      socket.off('presence_ouvrier', onPresenceOuvrier)
     }
   }, [])
 

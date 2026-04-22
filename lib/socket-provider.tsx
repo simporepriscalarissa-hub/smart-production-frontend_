@@ -13,29 +13,40 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
   const [connected, setConnected] = useState(false)
 
   useEffect(() => {
-    socket.on('connect', () => {
-      console.log('✅ Socket connecté')
+    // Utiliser des références nommées pour pouvoir les supprimer précisément
+    // sans affecter d'autres listeners enregistrés ailleurs
+    const onConnect = () => {
+      console.log('✅ Socket connecté:', socket.id)
       setConnected(true)
-    })
+    }
 
-    socket.on('disconnect', () => {
+    const onDisconnect = () => {
       console.log('❌ Socket déconnecté')
       setConnected(false)
-    })
+    }
 
-    socket.on('connect_error', (err) => {
-      console.log('❌ Erreur socket:', err.message)
+    const onConnectError = (err: Error) => {
+      console.error('❌ Erreur socket:', err.message)
       setConnected(false)
-    })
+    }
 
+    socket.on('connect', onConnect)
+    socket.on('disconnect', onDisconnect)
+    socket.on('connect_error', onConnectError)
+
+    // Connecter uniquement si ce n'est pas déjà fait
     if (!socket.connected) {
       socket.connect()
+    } else {
+      // Si déjà connecté (ex: après un soft navigation), mettre à jour l'état
+      setConnected(true)
     }
 
     return () => {
-      socket.off('connect')
-      socket.off('disconnect')
-      socket.off('connect_error')
+      // Nettoyer uniquement nos propres listeners, pas ceux des autres composants
+      socket.off('connect', onConnect)
+      socket.off('disconnect', onDisconnect)
+      socket.off('connect_error', onConnectError)
     }
   }, [])
 
