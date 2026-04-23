@@ -113,9 +113,9 @@ export default function DetectionIA() {
             {connected ? <Wifi size={15} /> : <WifiOff size={15} />}
             {connected ? 'Temps réel actif' : 'Hors ligne'}
           </div>
-          <div className="flex items-center gap-2 bg-purple-50 text-purple-600 px-4 py-2 rounded-full text-sm font-medium">
-            <Brain size={15} />
-            YOLOv11 actif
+          <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full">
+            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+            <span className="text-xs font-semibold text-emerald-700">YOLOv11</span>
           </div>
         </div>
       </div>
@@ -174,48 +174,60 @@ export default function DetectionIA() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-2 gap-6">
-
-        <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        {/* Colonne Analyse Principale (Prend 2/3 de l'espace) */}
+        <div className="md:col-span-2 flex flex-col gap-4">
           <Card className={`shadow-sm border-2 ${!dernierResultat ? 'border-zinc-100' : dernierResultat.conforme ? 'border-emerald-200' : 'border-red-200'}`}>
             <CardHeader className="pb-2">
               <div className="flex items-center gap-2">
                 <Brain size={18} className="text-purple-600" />
-                <CardTitle className="text-base">Dernière analyse YOLOv11</CardTitle>
+                <CardTitle className="text-base">Analyse YOLOv11 en temps réel</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
               {!dernierResultat ? (
-                <div className="py-12 text-center">
-                  <Brain size={48} className="text-zinc-200 mx-auto mb-3" />
-                  <p className="text-zinc-400 text-sm">En attente d&apos;une analyse...</p>
+                <div className="py-20 text-center">
+                  <div className="relative w-24 h-24 mx-auto mb-6">
+                    <div className="absolute inset-0 bg-purple-100 rounded-full animate-ping opacity-25" />
+                    <div className="relative bg-purple-50 w-24 h-24 rounded-full flex items-center justify-center">
+                      <Brain size={48} className="text-purple-200" />
+                    </div>
+                  </div>
+                  <p className="text-zinc-500 font-medium">En attente d'une détection caméra...</p>
+                  <p className="text-xs text-zinc-400 mt-1">Le système est prêt à analyser les pièces</p>
                 </div>
               ) : (
-                <div className="flex flex-col gap-4">
-                  <div className={`text-center py-8 rounded-xl ${dernierResultat.conforme ? 'bg-emerald-50' : 'bg-red-50'}`}>
-                    <p className="text-5xl mb-3">{dernierResultat.conforme ? '✅' : '❌'}</p>
-                    <p className={`text-2xl font-bold ${dernierResultat.conforme ? 'text-emerald-700' : 'text-red-700'}`}>
-                      {dernierResultat.conforme ? 'CONFORME' : 'NON CONFORME'}
+                <div className="flex flex-col gap-6">
+                  <div className={`text-center py-10 rounded-2xl ${dernierResultat.conforme ? 'bg-emerald-50' : 'bg-red-50'}`}>
+                    <div className="mb-4 inline-flex items-center justify-center w-20 h-20 rounded-full bg-white shadow-sm">
+                      <span className="text-4xl">{dernierResultat.conforme ? '✅' : '❌'}</span>
+                    </div>
+                    <p className={`text-3xl font-black ${dernierResultat.conforme ? 'text-emerald-700' : 'text-red-700'}`}>
+                      {dernierResultat.conforme ? 'PIÈCE CONFORME' : 'PIÈCE DÉFECTUEUSE'}
                     </p>
                     {!dernierResultat.conforme && (
-                      <p className="text-red-500 text-sm mt-1">{dernierResultat.nb_defauts} défaut(s)</p>
+                      <Badge className="bg-red-600 text-white mt-2 px-4 py-1 text-sm">
+                        {dernierResultat.classe} détecté
+                      </Badge>
                     )}
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-zinc-50 rounded-xl p-3 text-center">
-                      <p className="text-xs text-zinc-400 mb-1">Ouvrier</p>
-                      <p className="text-sm font-bold text-zinc-800">{dernierResultat.ouvrier}</p>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div className="bg-zinc-50 rounded-2xl p-4 border border-zinc-100">
+                      <p className="text-[10px] text-zinc-400 uppercase font-bold mb-1">Ouvrier</p>
+                      <p className="text-sm font-bold text-zinc-800 truncate">{dernierResultat.ouvrier}</p>
                     </div>
-                    <div className="bg-zinc-50 rounded-xl p-3 text-center">
-                      <p className="text-xs text-zinc-400 mb-1">Département</p>
+                    <div className="bg-zinc-50 rounded-2xl p-4 border border-zinc-100">
+                      <p className="text-[10px] text-zinc-400 uppercase font-bold mb-1">Département</p>
                       <p className="text-sm font-bold text-zinc-800">{dernierResultat.departement}</p>
                     </div>
-                    <div className="bg-zinc-50 rounded-xl p-3 text-center">
-                      <p className="text-xs text-zinc-400 mb-1">Confiance IA</p>
+                    <div className="bg-zinc-50 rounded-2xl p-4 border border-zinc-100">
+                      <p className="text-[10px] text-zinc-400 uppercase font-bold mb-1">Confiance IA</p>
                       <p className="text-sm font-bold text-blue-600">{dernierResultat.confiance}%</p>
                     </div>
-                    <div className="bg-zinc-50 rounded-xl p-3 text-center">
-                      <p className="text-xs text-zinc-400 mb-1">Heure</p>
+                    <div className="bg-zinc-50 rounded-2xl p-4 border border-zinc-100">
+                      <p className="text-[10px] text-zinc-400 uppercase font-bold mb-1">Heure</p>
                       <p className="text-sm font-bold text-zinc-800">{dernierResultat.heure}</p>
                     </div>
                   </div>
@@ -223,38 +235,35 @@ export default function DetectionIA() {
               )}
             </CardContent>
           </Card>
+        </div>
 
+        {/* Colonne Statistiques Secondaires (1/3) */}
+        <div className="flex flex-col gap-4">
           <Card className="shadow-sm border border-zinc-100">
             <CardHeader className="pb-2">
               <div className="flex items-center gap-2">
-                <AlertTriangle size={18} className="text-orange-500" />
-                <CardTitle className="text-base">Alertes récentes</CardTitle>
+                <CheckCircle size={18} className="text-emerald-500" />
+                <CardTitle className="text-base">Score de Qualité</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
-              {alertes.length === 0 ? (
-                <div className="py-6 text-center">
-                  <CheckCircle size={32} className="text-emerald-200 mx-auto mb-2" />
-                  <p className="text-zinc-400 text-sm">Aucune alerte</p>
+              <div className="flex flex-col items-center py-6">
+                <div className="relative w-32 h-32 flex items-center justify-center">
+                  <svg className="w-full h-full transform -rotate-90">
+                    <circle cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-zinc-100" />
+                    <circle cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-blue-500" 
+                      strokeDasharray={364} strokeDashoffset={364 - (364 * Number(tauxQualite)) / 100} strokeLinecap="round" />
+                  </svg>
+                  <span className="absolute text-2xl font-black text-zinc-800">{tauxQualite}%</span>
                 </div>
-              ) : (
-                <div className="flex flex-col gap-2">
-                  {alertes.map((a, i) => (
-                    <div key={i} className="flex items-start gap-3 bg-red-50 border border-red-100 rounded-xl p-3">
-                      <AlertTriangle size={16} className="text-red-500 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <p className="text-sm text-red-700 font-medium">{a.message}</p>
-                        <p className="text-xs text-red-400 mt-0.5">{a.heure}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                <p className="text-xs text-zinc-400 mt-4 text-center">Taux de réussite global des analyses IA</p>
+              </div>
             </CardContent>
           </Card>
         </div>
+      </div>
 
-        <Card className="shadow-sm border border-zinc-100">
+        <Card className="shadow-sm border border-zinc-100 mt-6">
           <CardHeader className="pb-2">
             <div className="flex items-center gap-2">
               <Activity size={18} className="text-zinc-600" />
