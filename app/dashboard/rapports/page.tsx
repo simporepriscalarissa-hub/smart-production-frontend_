@@ -35,8 +35,6 @@ export default function Rapports() {
   const [oee, setOee] = useState<OEE | null>(null)
   const [productions, setProductions] = useState<Production[]>([])
   const [loading, setLoading] = useState(true)
-  const [exportDate, setExportDate] = useState<string | null>(null)
-  const [exporting, setExporting] = useState(false)
   const [csvSuccess, setCsvSuccess] = useState(false)
   const reportRef = useRef<HTMLDivElement>(null)
 
@@ -58,58 +56,6 @@ export default function Rapports() {
     fetchData()
   }, [])
 
-  // ─── Export PDF ────────────────────────────────────────────────────────────
-  const exportPDF = async () => {
-    if (typeof window === 'undefined') return
-    const element = reportRef.current
-    if (!element) return
-
-    setExporting(true)
-
-    const dateStr = `${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}`
-    setExportDate(dateStr)
-
-    await new Promise(resolve => setTimeout(resolve, 200))
-
-    try {
-      const { default: html2canvas } = await import('html2canvas')
-      const jsPDF = (await import('jspdf')).jsPDF
-
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-      } as Parameters<typeof html2canvas>[1])
-
-      const imgData = canvas.toDataURL('image/jpeg', 0.98)
-      const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' })
-      const pageWidth  = pdf.internal.pageSize.getWidth()
-      const pageHeight = pdf.internal.pageSize.getHeight()
-      const imgHeight  = (canvas.height * pageWidth) / canvas.width
-
-      let heightLeft = imgHeight
-      let position   = 0
-
-      pdf.addImage(imgData, 'JPEG', 0, position, pageWidth, imgHeight)
-      heightLeft -= pageHeight
-
-      while (heightLeft > 0) {
-        position -= pageHeight
-        pdf.addPage()
-        pdf.addImage(imgData, 'JPEG', 0, position, pageWidth, imgHeight)
-        heightLeft -= pageHeight
-      }
-
-      pdf.save(`rapport-production-${new Date().toLocaleDateString('fr-FR')}.pdf`)
-    } catch (err) {
-      console.error('Erreur export PDF:', err)
-    } finally {
-      setTimeout(() => {
-        setExportDate(null)
-        setExporting(false)
-      }, 500)
-    }
-  }
 
   // ─── Export CSV ────────────────────────────────────────────────────────────
   const exportCSV = () => {
@@ -229,24 +175,6 @@ export default function Rapports() {
             Exporter CSV
           </button>
 
-          {/* Bouton PDF */}
-          <button
-            onClick={exportPDF}
-            disabled={exporting}
-            className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-blue-700 active:scale-95 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {exporting ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Génération...
-              </>
-            ) : (
-              <>
-                <Download size={16} />
-                Exporter en PDF
-              </>
-            )}
-          </button>
         </div>
       </div>
 
@@ -269,9 +197,6 @@ export default function Rapports() {
               Rapport de Production — Smart Production Counter
             </h3>
           </div>
-          {exportDate && (
-            <p className="text-blue-100 text-sm">Généré le {exportDate}</p>
-          )}
         </div>
 
         {/* KPIs */}
