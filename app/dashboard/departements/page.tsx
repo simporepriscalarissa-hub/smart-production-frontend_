@@ -52,7 +52,7 @@ export default function Departements() {
 
   const fetchSuperviseurs = async () => {
     try {
-      const res = await axios.get('/utilisateurs/role/superviseur')
+      const res = await axios.get('/users/role/superviseur')
       setSuperviseurs(res.data)
     } catch (err) {
       console.log('Erreur superviseurs:', err)
@@ -133,6 +133,15 @@ export default function Departements() {
               <Users size={18} className="text-zinc-400" />
             </div>
             <p className="text-3xl font-bold text-zinc-700">{totalOuvriers}</p>
+          </CardContent>
+        </Card>
+        <Card className="border-0 shadow-sm bg-purple-50">
+          <CardContent className="pt-5">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs text-purple-500 uppercase font-bold tracking-wider">Superviseurs</p>
+              <UserCheck size={18} className="text-purple-400" />
+            </div>
+            <p className="text-3xl font-bold text-purple-700">{superviseurs.length}</p>
           </CardContent>
         </Card>
       </div>
