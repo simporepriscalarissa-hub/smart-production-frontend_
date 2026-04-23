@@ -15,7 +15,7 @@ import {
  
 const menuAdmin = [
   { label: "Tableau de bord", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Entrée en production", href: "/dashboard/production", icon: Factory },
+  { label: "Historique des productions", href: "/dashboard/production", icon: Factory },
   { label: "Gestion des ouvriers", href: "/dashboard/ouvriers", icon: Users },
   { label: "Gestion des utilisateurs", href: "/dashboard/users", icon: UserCog },
   { label: "Départements", href: "/dashboard/departements", icon: Building2 },

@@ -178,8 +178,8 @@ export default function Production() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-zinc-800">Entrée en Production</h2>
-          <p className="text-sm text-zinc-500">Gestion des productions par ouvrier</p>
+          <h2 className="text-2xl font-bold text-zinc-800">Historique des productions</h2>
+          <p className="text-sm text-zinc-500">Gérez les enregistrements de production et la qualité</p>
         </div>
         <div className="flex gap-3">
           {/* Superviseur — signaler non conformes */}
