@@ -182,7 +182,6 @@ export default function DetectionIA() {
             <CardHeader className="pb-2">
               <div className="flex items-center gap-2">
                 <Brain size={18} className="text-purple-600" />
-                <CardTitle className="text-base">Analyse YOLOv11 en temps réel</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
