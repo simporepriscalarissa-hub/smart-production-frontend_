@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import axios from '@/lib/axios'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { UserPlus, Trash2, Users, CreditCard, Building2, AlertTriangle, X, Edit3, Save } from 'lucide-react'
+import { UserPlus, Trash2, Users, CreditCard, Building2, AlertTriangle, X, Edit3, Save, UserCheck } from 'lucide-react'
 
 interface Ouvrier {
   id: number
