@@ -106,16 +106,12 @@ export default function DetectionIA() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-zinc-800">Monitoring IA</h2>
-          <p className="text-sm text-zinc-500">Surveillance automatique des défauts par YOLOv11</p>
+          <p className="text-sm text-zinc-500">Surveillance automatique des défauts de production</p>
         </div>
         <div className="flex items-center gap-3">
           <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium ${connected ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-500'}`}>
             {connected ? <Wifi size={15} /> : <WifiOff size={15} />}
             {connected ? 'Temps réel actif' : 'Hors ligne'}
-          </div>
-          <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full">
-            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-            <span className="text-xs font-semibold text-emerald-700">YOLOv11</span>
           </div>
         </div>
       </div>
@@ -174,27 +170,19 @@ export default function DetectionIA() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="flex flex-col gap-6">
         
-        {/* Colonne Analyse Principale (Prend 2/3 de l'espace) */}
-        <div className="md:col-span-2 flex flex-col gap-4">
-          <Card className={`shadow-sm border-2 ${!dernierResultat ? 'border-zinc-100' : dernierResultat.conforme ? 'border-emerald-200' : 'border-red-200'}`}>
-            <CardHeader className="pb-2">
-              <div className="flex items-center gap-2">
-                <Brain size={18} className="text-purple-600" />
-              </div>
-            </CardHeader>
-            <CardContent>
+        {/* Carte d'Analyse Principale (Pleine largeur) */}
+        <Card className={`shadow-sm border-2 ${!dernierResultat ? 'border-zinc-100' : dernierResultat.conforme ? 'border-emerald-200' : 'border-red-200'}`}>
+          <CardHeader className="pb-2">
+            <div className="flex items-center gap-2">
+              <Brain size={18} className="text-purple-600" />
+            </div>
+          </CardHeader>
+          <CardContent>
               {!dernierResultat ? (
-                <div className="py-20 text-center">
-                  <div className="relative w-24 h-24 mx-auto mb-6">
-                    <div className="absolute inset-0 bg-purple-100 rounded-full animate-ping opacity-25" />
-                    <div className="relative bg-purple-50 w-24 h-24 rounded-full flex items-center justify-center">
-                      <Brain size={48} className="text-purple-200" />
-                    </div>
-                  </div>
-                  <p className="text-zinc-500 font-medium">En attente d'une détection caméra...</p>
-                  <p className="text-xs text-zinc-400 mt-1">Le système est prêt à analyser les pièces</p>
+                <div className="py-32 text-center">
+                  <p className="text-zinc-300 text-sm italic">Système de surveillance prêt</p>
                 </div>
               ) : (
                 <div className="flex flex-col gap-6">
@@ -233,33 +221,7 @@ export default function DetectionIA() {
                 </div>
               )}
             </CardContent>
-          </Card>
-        </div>
-
-        {/* Colonne Statistiques Secondaires (1/3) */}
-        <div className="flex flex-col gap-4">
-          <Card className="shadow-sm border border-zinc-100">
-            <CardHeader className="pb-2">
-              <div className="flex items-center gap-2">
-                <CheckCircle size={18} className="text-emerald-500" />
-                <CardTitle className="text-base">Score de Qualité</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col items-center py-6">
-                <div className="relative w-32 h-32 flex items-center justify-center">
-                  <svg className="w-full h-full transform -rotate-90">
-                    <circle cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-zinc-100" />
-                    <circle cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-blue-500" 
-                      strokeDasharray={364} strokeDashoffset={364 - (364 * Number(tauxQualite)) / 100} strokeLinecap="round" />
-                  </svg>
-                  <span className="absolute text-2xl font-black text-zinc-800">{tauxQualite}%</span>
-                </div>
-                <p className="text-xs text-zinc-400 mt-4 text-center">Taux de réussite global des analyses IA</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        </Card>
       </div>
 
         <Card className="shadow-sm border border-zinc-100 mt-6">
