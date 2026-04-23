@@ -307,7 +307,6 @@ export default function DetectionIA() {
           </CardContent>
         </Card>
 
-      </div>
     </div>
   )
 }
