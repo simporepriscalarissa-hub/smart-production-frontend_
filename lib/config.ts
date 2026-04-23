@@ -1,6 +1,6 @@
 export const APP_CONFIG = {
   entreprise: 'Entreprise',
-  apiUrl: process.env.NEXT_PUBLIC_API_URL || 'https://smartproduction.duckdns.org:3001',
+  apiUrl: process.env.NEXT_PUBLIC_API_URL || 'https://smartproduction.duckdns.org',
   iaUrl: 'https://priscalarissa-smart-production-ia.hf.space',
   unite: 'produits',
   references: ['Pièce-001', 'Pièce-002', 'Pièce-003'],
