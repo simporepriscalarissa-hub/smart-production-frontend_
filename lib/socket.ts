@@ -1,6 +1,6 @@
 import { io, Socket } from 'socket.io-client'
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL || 'https://smartproduction.duckdns.org';
+const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL || 'https://smartproduction.duckdns.org:3001';
 
 // autoConnect: false → la connexion est gérée explicitement par le SocketProvider
 // Évite les connexions dupliquées lors du SSR Next.js et des refreshs de page
