@@ -22,7 +22,7 @@ const menuAdmin = [
   { label: "Rapports", href: "/dashboard/rapports", icon: BarChart3 },
   { label: "Écran TV", href: "/dashboard/ecran-tv", icon: Tv },
   { label: "Paramètres", href: "/dashboard/parametres", icon: Settings },
-  { label: "Détection IA", href: "/dashboard/detection-ia", icon: Brain },
+  { label: "Détection IA", href: "/dashboard/detection-ia", icon: Scan },
 ]
 
 const menuSuperviseur = [

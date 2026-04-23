@@ -181,17 +181,18 @@ export default function DetectionIA() {
                 <CardTitle className="text-base">Flux des détections en temps réel</CardTitle>
               </div>
               {connected && (
-                <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 text-[10px] font-bold">
-                  🔴 LIVE
-                </Badge>
+                <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-md border border-emerald-100">
+                  <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider">Direct</span>
+                </div>
               )}
             </div>
           </CardHeader>
           <CardContent className="p-0">
             {analyses.length === 0 ? (
               <div className="py-24 text-center">
-                <Brain size={48} className="text-zinc-100 mx-auto mb-4" />
-                <p className="text-zinc-400 text-sm italic">Aucune détection enregistrée pour le moment</p>
+                <Activity size={48} className="text-zinc-100 mx-auto mb-4" />
+                <p className="text-zinc-400 text-sm italic">Système de surveillance actif — En attente de données</p>
               </div>
             ) : (
               <div className="overflow-x-auto">

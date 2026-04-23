@@ -334,7 +334,10 @@ export default function EcranTV() {
 
           {tvConfig.afficherTop5 && (
             <div className="bg-zinc-800 rounded-2xl p-6 border border-zinc-700">
-              <p className="text-lg font-bold text-yellow-400 mb-4">🏆 TOP 5 — Les plus performants</p>
+              <p className="text-lg font-bold text-yellow-500 mb-4 flex items-center gap-2">
+                <Users size={20} />
+                TOP 5 — Performance
+              </p>
               <div className="flex flex-col gap-3">
                 {top5.map((o, i) => (
                   <div key={i} className="flex items-center justify-between bg-zinc-700 rounded-xl px-4 py-3">
@@ -364,7 +367,10 @@ export default function EcranTV() {
 
           {tvConfig.afficherProductions && (
             <div className="bg-zinc-800 rounded-2xl p-6 border border-zinc-700">
-              <p className="text-lg font-bold text-blue-400 mb-4">⚡ Productions récentes</p>
+              <p className="text-lg font-bold text-blue-400 mb-4 flex items-center gap-2">
+                <Activity size={20} />
+                Productions récentes
+              </p>
               <div className="flex flex-col gap-3">
                 {productions.map((p) => (
                   <div key={p.id} className="flex items-center justify-between bg-zinc-700 rounded-xl px-4 py-3">
@@ -381,8 +387,8 @@ export default function EcranTV() {
                     </div>
                     <div className="text-right">
                       <p className="text-lg font-bold text-white">{p.quantiteProduite} pcs</p>
-                      <span className={`text-xs font-bold px-2 py-1 rounded-full ${p.quantiteNonConforme === 0 ? 'bg-emerald-900 text-emerald-400' : 'bg-red-900 text-red-400'}`}>
-                        {p.quantiteNonConforme === 0 ? '✅ OK' : `❌ ${p.quantiteNonConforme} NOK`}
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${p.quantiteNonConforme === 0 ? 'bg-emerald-900/30 text-emerald-400 border-emerald-800' : 'bg-red-900/30 text-red-400 border-red-800'}`}>
+                        {p.quantiteNonConforme === 0 ? 'CONFORME' : `${p.quantiteNonConforme} REJET(S)`}
                       </span>
                     </div>
                   </div>
