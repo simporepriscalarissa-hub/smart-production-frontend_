@@ -172,102 +172,82 @@ export default function DetectionIA() {
 
       <div className="flex flex-col gap-6">
         
-        {/* Carte d'Analyse Principale (Pleine largeur) */}
-        <Card className={`shadow-sm border-2 ${!dernierResultat ? 'border-zinc-100' : dernierResultat.conforme ? 'border-emerald-200' : 'border-red-200'}`}>
-          <CardHeader className="pb-2">
-            <div className="flex items-center gap-2">
-              <Brain size={18} className="text-purple-600" />
-            </div>
-          </CardHeader>
-          <CardContent>
-              {!dernierResultat ? (
-                <div className="py-32 text-center">
-                  <p className="text-zinc-300 text-sm italic">Système de surveillance prêt</p>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-6">
-                  <div className={`text-center py-10 rounded-2xl ${dernierResultat.conforme ? 'bg-emerald-50' : 'bg-red-50'}`}>
-                    <div className="mb-4 inline-flex items-center justify-center w-20 h-20 rounded-full bg-white shadow-sm">
-                      <span className="text-4xl">{dernierResultat.conforme ? '✅' : '❌'}</span>
-                    </div>
-                    <p className={`text-3xl font-black ${dernierResultat.conforme ? 'text-emerald-700' : 'text-red-700'}`}>
-                      {dernierResultat.conforme ? 'PIÈCE CONFORME' : 'PIÈCE DÉFECTUEUSE'}
-                    </p>
-                    {!dernierResultat.conforme && (
-                      <Badge className="bg-red-600 text-white mt-2 px-4 py-1 text-sm">
-                        {dernierResultat.classe} détecté
-                      </Badge>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <div className="bg-zinc-50 rounded-2xl p-4 border border-zinc-100">
-                      <p className="text-[10px] text-zinc-400 uppercase font-bold mb-1">Ouvrier</p>
-                      <p className="text-sm font-bold text-zinc-800 truncate">{dernierResultat.ouvrier}</p>
-                    </div>
-                    <div className="bg-zinc-50 rounded-2xl p-4 border border-zinc-100">
-                      <p className="text-[10px] text-zinc-400 uppercase font-bold mb-1">Département</p>
-                      <p className="text-sm font-bold text-zinc-800">{dernierResultat.departement}</p>
-                    </div>
-                    <div className="bg-zinc-50 rounded-2xl p-4 border border-zinc-100">
-                      <p className="text-[10px] text-zinc-400 uppercase font-bold mb-1">Confiance IA</p>
-                      <p className="text-sm font-bold text-blue-600">{dernierResultat.confiance}%</p>
-                    </div>
-                    <div className="bg-zinc-50 rounded-2xl p-4 border border-zinc-100">
-                      <p className="text-[10px] text-zinc-400 uppercase font-bold mb-1">Heure</p>
-                      <p className="text-sm font-bold text-zinc-800">{dernierResultat.heure}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-        </Card>
-      </div>
-
-        <Card className="shadow-sm border border-zinc-100 mt-6">
-          <CardHeader className="pb-2">
-            <div className="flex items-center gap-2">
-              <Activity size={18} className="text-zinc-600" />
-              <CardTitle className="text-base">Historique des analyses</CardTitle>
+        {/* Liste des détections IA (Pleine largeur) */}
+        <Card className="shadow-sm border border-zinc-100">
+          <CardHeader className="pb-4 border-b border-zinc-50">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Activity size={18} className="text-blue-600" />
+                <CardTitle className="text-base">Flux des détections en temps réel</CardTitle>
+              </div>
               {connected && (
-                <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 ml-auto text-xs">
-                  🔴 Live
+                <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 text-[10px] font-bold">
+                  🔴 LIVE
                 </Badge>
               )}
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-0">
             {analyses.length === 0 ? (
-              <div className="py-16 text-center">
-                <Brain size={48} className="text-zinc-200 mx-auto mb-3" />
-                <p className="text-zinc-400 text-sm">En attente des résultats IA...</p>
+              <div className="py-24 text-center">
+                <Brain size={48} className="text-zinc-100 mx-auto mb-4" />
+                <p className="text-zinc-400 text-sm italic">Aucune détection enregistrée pour le moment</p>
               </div>
             ) : (
-              <div className="flex flex-col gap-2 max-h-96 overflow-y-auto">
-                {analyses.map((a) => (
-                  <div key={a.id} className={`flex items-center justify-between p-3 rounded-xl border ${a.conforme ? 'bg-emerald-50 border-emerald-100' : 'bg-red-50 border-red-100'}`}>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xl">{a.conforme ? '✅' : '❌'}</span>
-                      <div>
-                        <p className="text-sm font-medium text-zinc-800">
-                          {a.conforme ? 'Conforme' : `${a.nb_defauts} défaut(s)`}
-                        </p>
-                        <p className="text-xs text-zinc-400">{a.ouvrier} — {a.departement}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <Badge className={`text-xs ${a.conforme ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100' : 'bg-red-100 text-red-700 hover:bg-red-100'}`}>
-                        {a.confiance}%
-                      </Badge>
-                      <p className="text-xs text-zinc-400 mt-1">{a.heure}</p>
-                    </div>
-                  </div>
-                ))}
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-zinc-50 text-zinc-500 border-b border-zinc-100">
+                      <th className="text-left py-3 px-6 font-semibold uppercase tracking-wider text-[10px]">Ouvrier</th>
+                      <th className="text-left py-3 px-6 font-semibold uppercase tracking-wider text-[10px]">Statut</th>
+                      <th className="text-left py-3 px-6 font-semibold uppercase tracking-wider text-[10px]">Type de Défaut</th>
+                      <th className="text-left py-3 px-6 font-semibold uppercase tracking-wider text-[10px]">Confiance</th>
+                      <th className="text-right py-3 px-6 font-semibold uppercase tracking-wider text-[10px]">Heure</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-100">
+                    {analyses.map((a) => (
+                      <tr key={a.id} className="hover:bg-zinc-50 transition-colors">
+                        <td className="py-4 px-6">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center font-bold text-[10px]">
+                              {a.ouvrier.split(' ').map(n => n[0]).join('')}
+                            </div>
+                            <span className="font-medium text-zinc-700">{a.ouvrier}</span>
+                          </div>
+                        </td>
+                        <td className="py-4 px-6">
+                          <Badge className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${a.conforme ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+                            {a.conforme ? 'Conforme' : 'Défaut'}
+                          </Badge>
+                        </td>
+                        <td className="py-4 px-6">
+                          {a.conforme ? (
+                            <span className="text-zinc-300 text-xs italic">Aucun défaut</span>
+                          ) : (
+                            <span className="text-red-600 font-bold">{a.classe}</span>
+                          )}
+                        </td>
+                        <td className="py-4 px-6">
+                          <div className="flex items-center gap-2">
+                            <div className="w-12 h-1.5 bg-zinc-100 rounded-full overflow-hidden">
+                              <div className="h-full bg-blue-500" style={{ width: `${a.confiance}%` }} />
+                            </div>
+                            <span className="text-zinc-500 text-[10px] font-mono">{a.confiance}%</span>
+                          </div>
+                        </td>
+                        <td className="py-4 px-6 text-right text-zinc-400 font-mono text-[10px]">
+                          {a.heure}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </CardContent>
         </Card>
-
+      </div>
     </div>
   )
 }
