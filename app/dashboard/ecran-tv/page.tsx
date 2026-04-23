@@ -289,6 +289,24 @@ export default function EcranTV() {
           </div>
         </div>
 
+        {/* OEE Global (Grand format si activé seul) */}
+        {tvConfig.afficherOEE && !tvConfig.afficherKPIs && (
+          <div className="bg-zinc-800 rounded-2xl p-12 text-center border-2 border-blue-600 shadow-lg shadow-blue-900/20">
+            <p className="text-zinc-400 text-2xl uppercase tracking-[0.3em] mb-6">OEE Global de Production</p>
+            <p className="text-[12rem] font-black text-blue-400 leading-none">{oee?.oee ?? '—'}</p>
+            <div className="mt-8 flex justify-center gap-12">
+               <div className="text-center">
+                  <p className="text-zinc-500 text-lg">Qualité</p>
+                  <p className="text-3xl font-bold text-emerald-400">{oee?.qualite ?? '—'}</p>
+               </div>
+               <div className="text-center">
+                  <p className="text-zinc-500 text-lg">Total Produit</p>
+                  <p className="text-3xl font-bold text-white">{oee?.totalProduit ?? '—'}</p>
+               </div>
+            </div>
+          </div>
+        )}
+
         {/* KPIs */}
         {tvConfig.afficherKPIs && (
           <div className="grid grid-cols-4 gap-4">
