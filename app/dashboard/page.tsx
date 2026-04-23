@@ -365,9 +365,10 @@ export default function Dashboard() {
             <Package size={18} className="text-zinc-600" />
             <CardTitle className="text-base">Dernières productions</CardTitle>
             {connected && (
-              <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 ml-auto text-xs">
-                🔴 Live
-              </Badge>
+              <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-md border border-emerald-100 ml-auto">
+                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                <span className="text-[10px] font-bold uppercase tracking-wider">Direct</span>
+              </div>
             )}
           </div>
         </CardHeader>

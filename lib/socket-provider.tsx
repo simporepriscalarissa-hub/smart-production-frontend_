@@ -16,17 +16,17 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     // Utiliser des références nommées pour pouvoir les supprimer précisément
     // sans affecter d'autres listeners enregistrés ailleurs
     const onConnect = () => {
-      console.log('✅ Socket connecté:', socket.id)
+      console.log('Socket connecté:', socket.id)
       setConnected(true)
     }
 
     const onDisconnect = () => {
-      console.log('❌ Socket déconnecté')
+      console.log('Socket déconnecté')
       setConnected(false)
     }
 
     const onConnectError = (err: Error) => {
-      console.error('❌ Erreur socket:', err.message)
+      console.error('Erreur socket:', err.message)
       setConnected(false)
     }
 
