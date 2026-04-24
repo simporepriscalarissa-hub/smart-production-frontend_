@@ -259,7 +259,7 @@ export default function Ouvriers() {
       )}
 
       {/* Header */}
-      <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-zinc-100">
+      <div className="flex flex-wrap justify-between items-start gap-4 bg-white p-6 rounded-2xl shadow-sm border border-zinc-100">
         <div>
           <h2 className="text-2xl font-black text-zinc-800 tracking-tight">{titreHeader}</h2>
           <p className="text-sm text-zinc-500 flex items-center gap-1.5 mt-1">

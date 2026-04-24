@@ -9,8 +9,7 @@ import Image from "next/image"
 import {
   LayoutDashboard, Factory, Users, UserCog,
   Building2, BarChart3, Tv, Settings, LogOut, Eye,
-  Scan,
-  Brain,
+  Scan, X,
 } from "lucide-react"
  
 const menuAdmin = [
@@ -39,7 +38,7 @@ interface UserData {
   departement?: string
 }
 
-export default function SidebarContent() {
+export default function SidebarContent({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname()
   const [user, setUser] = useState<UserData | null>(null)
   const [mounted, setMounted] = useState(false)
@@ -70,16 +69,23 @@ export default function SidebarContent() {
     <div className="flex flex-col h-full">
 
       {/* Logo */}
-      <div className="flex items-center gap-3 border-b p-4 h-16">
-        <Image
-          src="/logo.png"
-          alt="Logo"
-          width={32}
-          height={32}
-          className="rounded-lg"
-          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
-        />
-        <span className="text-sm font-bold text-blue-800">{APP_CONFIG.entreprise}</span>
+      <div className="flex items-center justify-between gap-3 border-b p-4 h-16">
+        <div className="flex items-center gap-3">
+          <Image
+            src="/logo.png"
+            alt="Logo"
+            width={32}
+            height={32}
+            className="rounded-lg"
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+          />
+          <span className="text-sm font-bold text-blue-800">{APP_CONFIG.entreprise}</span>
+        </div>
+        {onClose && (
+          <button onClick={onClose} className="md:hidden p-1 rounded-lg hover:bg-zinc-100">
+            <X size={18} className="text-zinc-400" />
+          </button>
+        )}
       </div>
 
       <ScrollArea className="flex-1 p-4">
@@ -101,6 +107,7 @@ export default function SidebarContent() {
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={() => onClose?.()}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all ${
                   isActive
                     ? 'bg-blue-600 text-white font-medium shadow-sm'

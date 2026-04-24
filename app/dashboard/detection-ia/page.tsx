@@ -108,15 +108,15 @@ export default function DetectionIA() {
           <h2 className="text-2xl font-bold text-zinc-800">Monitoring IA</h2>
           <p className="text-sm text-zinc-500">Surveillance automatique des défauts de production</p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium ${connected ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-500'}`}>
-            {connected ? <Wifi size={15} /> : <WifiOff size={15} />}
-            {connected ? 'Temps réel actif' : 'Hors ligne'}
+        <div className="flex items-center gap-2">
+          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${connected ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-500'}`}>
+            {connected ? <Wifi size={13} /> : <WifiOff size={13} />}
+            {connected ? 'Temps réel' : 'Hors ligne'}
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="border-0 shadow-sm bg-zinc-50">
           <CardContent className="pt-5">
             <div className="flex items-center justify-between mb-3">

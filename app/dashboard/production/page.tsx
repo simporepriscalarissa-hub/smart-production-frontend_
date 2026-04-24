@@ -176,12 +176,12 @@ export default function Production() {
       )}
 
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-wrap justify-between items-start gap-4">
         <div>
           <h2 className="text-2xl font-bold text-zinc-800">Historique des productions</h2>
           <p className="text-sm text-zinc-500">Gérez les enregistrements de production et la qualité</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           {/* Superviseur — signaler non conformes */}
           {isSuperviseur && (
             <button
@@ -206,7 +206,7 @@ export default function Production() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="border-0 shadow-sm bg-zinc-50">
           <CardContent className="pt-5">
             <div className="flex items-center justify-between">
@@ -397,7 +397,8 @@ export default function Production() {
           {productions.length === 0 ? (
             <p className="text-zinc-400 text-sm text-center py-8">Aucune production enregistrée</p>
           ) : (
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[600px]">
               <thead>
                 <tr className="border-b text-zinc-400">
                   <th className="text-left py-3 font-medium">Ouvrier</th>
@@ -457,6 +458,7 @@ export default function Production() {
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </CardContent>
       </Card>
