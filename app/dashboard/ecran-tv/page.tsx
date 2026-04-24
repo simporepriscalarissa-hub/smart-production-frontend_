@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import axios from '@/lib/axios'
-import { Monitor, RefreshCw, Building2, CheckCircle, Save, Maximize, Minimize, Settings } from 'lucide-react'
+import { Monitor, RefreshCw, Building2, CheckCircle, Save, Maximize, Minimize, Settings, Users, Activity } from 'lucide-react'
 
 interface OEE {
   oee: string
