@@ -9,7 +9,7 @@ import { Plus, Trash2, Package, CheckCircle, XCircle, ClipboardList, AlertTriang
 interface Production {
   id: number
   ouvrier: { prenom: string; nom: string }
-  reference: string
+  reference: { id: number; code: string; libelle: string } | null
   quantiteProduite: number
   quantiteConforme: number
   quantiteNonConforme: number
@@ -105,7 +105,7 @@ export default function Production() {
     try {
       await axios.post('/production', {
         ouvrierId: parseInt(form.ouvrierId),
-        reference: form.reference,
+        referenceCode: form.reference,
         quantiteProduite: parseInt(form.quantiteProduite),
         quantiteConforme: parseInt(form.quantiteConforme),
         quantiteNonConforme: parseInt(form.quantiteNonConforme),
@@ -125,7 +125,7 @@ export default function Production() {
       const qte = parseInt(formNonConforme.quantiteNonConforme)
       await axios.post('/production', {
         ouvrierId: parseInt(formNonConforme.ouvrierId),
-        reference: formNonConforme.reference,
+        referenceCode: formNonConforme.reference,
         quantiteProduite: qte,
         quantiteConforme: 0,
         quantiteNonConforme: qte,
@@ -425,7 +425,7 @@ export default function Production() {
                       </div>
                     </td>
                     <td className="py-3">
-                      <Badge className="bg-blue-50 text-blue-600 hover:bg-blue-50 font-normal">{p.reference}</Badge>
+                      <Badge className="bg-blue-50 text-blue-600 hover:bg-blue-50 font-normal">{p.reference?.code ?? '—'}</Badge>
                     </td>
                     <td className="py-3 font-bold">{p.quantiteProduite}</td>
                     <td className="py-3 text-emerald-600 font-bold">{p.quantiteConforme}</td>
