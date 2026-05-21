@@ -9,7 +9,7 @@ import { Package, CheckCircle, XCircle, TrendingUp, LogOut, Clock } from 'lucide
 
 interface Production {
   id: number
-  reference: string
+  reference: { id: number; code: string; libelle: string; tempsCycle: number } | null
   quantiteProduite: number
   quantiteConforme: number
   quantiteNonConforme: number
@@ -210,8 +210,8 @@ export default function Operateur() {
                 {productions.map((p) => (
                   <tr key={p.id} className="border-b hover:bg-zinc-50 transition-colors">
                     <td className="py-3 px-5">
-                      <Badge className="bg-blue-50 text-blue-600 hover:bg-blue-50 font-normal">
-                        {p.reference}
+                      <Badge className="bg-blue-50 text-blue-600 hover:bg-blue-50 font-mono">
+                        {p.reference?.code ?? '—'}
                       </Badge>
                     </td>
                     <td className="py-3 font-bold">{p.quantiteProduite}</td>

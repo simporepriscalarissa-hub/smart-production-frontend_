@@ -9,10 +9,10 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { TrendingUp, Package, CheckCircle, XCircle, Trophy, AlertTriangle, Activity, Wifi, WifiOff } from 'lucide-react'
 
 interface OEE {
-  oee: string
-  qualite: string
-  disponibilite: string
-  performance: string
+  oee: number
+  qualite: number
+  disponibilite: number
+  performance: number
   totalProduit: number
   totalNonConforme: number
 }
@@ -23,7 +23,7 @@ interface Production {
   quantiteProduite: number
   quantiteConforme: number
   quantiteNonConforme: number
-  reference: string
+  reference: { id: number; code: string; libelle: string } | null
   createdAt: string
 }
 
@@ -48,6 +48,7 @@ export default function Dashboard() {
   const [moins5, setMoins5] = useState<OuvrierStat[]>([])
   const [connected, setConnected] = useState(false)
   const [notifications, setNotifications] = useState<Notification[]>([])
+  const [oeeAlerte, setOeeAlerte] = useState(false)
 
   const addNotification = (message: string, type: 'success' | 'error' | 'info') => {
     const id = Date.now() + Math.random()
@@ -82,6 +83,7 @@ export default function Dashboard() {
         axios.get('/production'),
       ])
       setOee(oeeRes.data)
+      setOeeAlerte(oeeRes.data.oee < 50)
       setProductions(prodRes.data)
       calculerStats(prodRes.data)
     } catch (err) {
@@ -129,6 +131,7 @@ export default function Dashboard() {
 
     const onOeeUpdate = (data: OEE) => {
       setOee(data)
+      setOeeAlerte(data.oee < 50)
     }
 
     const onPresenceOuvrier = (ouvrier: { prenom: string; nom: string }) => {
@@ -180,6 +183,27 @@ export default function Dashboard() {
         ))}
       </div>
 
+      {/* Alerte OEE critique */}
+      {oeeAlerte && (
+        <div className="flex items-center gap-3 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 animate-in slide-in-from-top-2">
+          <div className="w-9 h-9 bg-red-100 rounded-xl flex items-center justify-center shrink-0">
+            <AlertTriangle size={20} className="text-red-600 animate-pulse" />
+          </div>
+          <div className="flex-1">
+            <p className="font-semibold text-sm">OEE critique — Performance insuffisante</p>
+            <p className="text-xs text-red-500 mt-0.5">
+              L&apos;OEE est à <span className="font-bold">{oee?.oee ?? 0}%</span>, en dessous du seuil critique de 50%. Vérifiez la cadence et la qualité de production.
+            </p>
+          </div>
+          <button
+            onClick={() => setOeeAlerte(false)}
+            className="text-red-400 hover:text-red-600 text-lg leading-none px-1"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -202,16 +226,23 @@ export default function Dashboard() {
 
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="border-0 shadow-sm bg-blue-50">
+        <Card className={`border-0 shadow-sm ${oeeAlerte ? 'bg-red-50 ring-2 ring-red-300' : 'bg-blue-50'}`}>
           <CardContent className="pt-5">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-xs text-blue-500 uppercase tracking-wide font-semibold">OEE Global</p>
-              <div className="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center">
-                <TrendingUp size={18} className="text-blue-600" />
+              <p className={`text-xs uppercase tracking-wide font-semibold ${oeeAlerte ? 'text-red-500' : 'text-blue-500'}`}>OEE Global</p>
+              <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${oeeAlerte ? 'bg-red-100' : 'bg-blue-100'}`}>
+                {oeeAlerte
+                  ? <AlertTriangle size={18} className="text-red-600 animate-pulse" />
+                  : <TrendingUp size={18} className="text-blue-600" />
+                }
               </div>
             </div>
-            <p className="text-3xl font-bold text-blue-700">{oee?.oee ?? '—'}</p>
-            <p className="text-xs text-blue-400 mt-1">Efficacité globale</p>
+            <p className={`text-3xl font-bold ${oeeAlerte ? 'text-red-600' : 'text-blue-700'}`}>
+              {oee?.oee ?? '—'}{oee !== null ? '%' : ''}
+            </p>
+            <p className={`text-xs mt-1 ${oeeAlerte ? 'text-red-400' : 'text-blue-400'}`}>
+              {oeeAlerte ? '⚠ En dessous du seuil (50%)' : 'Efficacité globale'}
+            </p>
           </CardContent>
         </Card>
 
@@ -393,8 +424,8 @@ export default function Dashboard() {
                   <tr key={p.id} className="border-b hover:bg-zinc-50 transition-colors">
                     <td className="py-3 font-medium">{p.ouvrier?.prenom} {p.ouvrier?.nom}</td>
                     <td className="py-3">
-                      <Badge className="bg-blue-50 text-blue-600 hover:bg-blue-50 font-normal">
-                        {p.reference}
+                      <Badge className="bg-blue-50 text-blue-600 hover:bg-blue-50 font-mono">
+                        {p.reference?.code ?? '—'}
                       </Badge>
                     </td>
                     <td className="py-3 font-bold">{p.quantiteProduite}</td>

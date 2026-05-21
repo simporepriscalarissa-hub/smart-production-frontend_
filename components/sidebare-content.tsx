@@ -9,12 +9,13 @@ import Image from "next/image"
 import {
   LayoutDashboard, Factory, Users, UserCog,
   Building2, BarChart3, Tv, Settings, LogOut, Eye,
-  X,
+  X, Tag,
 } from "lucide-react"
- 
+
 const menuAdmin = [
   { label: "Tableau de bord", href: "/dashboard", icon: LayoutDashboard },
   { label: "Historique des productions", href: "/dashboard/production", icon: Factory },
+  { label: "Références produit", href: "/dashboard/references", icon: Tag },
   { label: "Gestion des ouvriers", href: "/dashboard/ouvriers", icon: Users },
   { label: "Gestion des utilisateurs", href: "/dashboard/users", icon: UserCog },
   { label: "Départements", href: "/dashboard/departements", icon: Building2 },
