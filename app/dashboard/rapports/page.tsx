@@ -25,7 +25,7 @@ interface Production {
   quantiteProduite: number
   quantiteConforme: number
   quantiteNonConforme: number
-  reference: string
+  reference: { id: number; code: string; libelle: string } | null
   createdAt: string
 }
 
@@ -75,7 +75,7 @@ export default function Rapports() {
     const rows = productions.map(p => [
       p.ouvrier?.prenom ?? '',
       p.ouvrier?.nom    ?? '',
-      p.reference,
+      p.reference?.code ?? '—',
       p.quantiteProduite,
       p.quantiteConforme,
       p.quantiteNonConforme,
@@ -352,7 +352,7 @@ export default function Rapports() {
                         </td>
                         <td className="py-2">
                           <Badge className="bg-blue-50 text-blue-600 hover:bg-blue-50">
-                            {p.reference}
+                            {p.reference?.code ?? '—'}
                           </Badge>
                         </td>
                         <td className="py-2 font-bold">{p.quantiteProduite}</td>

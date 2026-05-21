@@ -17,7 +17,7 @@ interface Production {
   quantiteProduite: number
   quantiteConforme: number
   quantiteNonConforme: number
-  reference: string
+  reference: { id: number; code: string; libelle: string } | null
   createdAt: string
 }
 
@@ -382,7 +382,7 @@ export default function EcranTV() {
                       </div>
                       <div>
                         <p className="font-semibold text-white">{p.ouvrier?.prenom} {p.ouvrier?.nom}</p>
-                        <p className="text-xs text-zinc-400">{p.reference}</p>
+                        <p className="text-xs text-zinc-400">{p.reference?.code ?? '—'}</p>
                       </div>
                     </div>
                     <div className="text-right">
