@@ -254,7 +254,7 @@ export default function Dashboard() {
                 <Package size={18} className="text-zinc-600" />
               </div>
             </div>
-            <p className="text-3xl font-bold text-zinc-800">{oee?.totalProduit ?? '—'}</p>
+            <p className="text-3xl font-bold text-zinc-800">{productions.reduce((s, p) => s + p.quantiteProduite, 0)}</p>
             <p className="text-xs text-zinc-400 mt-1">Unités fabriquées</p>
           </CardContent>
         </Card>
@@ -280,7 +280,7 @@ export default function Dashboard() {
                 <XCircle size={18} className="text-red-600" />
               </div>
             </div>
-            <p className="text-3xl font-bold text-red-600">{oee?.totalNonConforme ?? '—'}</p>
+            <p className="text-3xl font-bold text-red-600">{productions.reduce((s, p) => s + p.quantiteNonConforme, 0)}</p>
             <p className="text-xs text-red-400 mt-1">Unités rejetées</p>
           </CardContent>
         </Card>
