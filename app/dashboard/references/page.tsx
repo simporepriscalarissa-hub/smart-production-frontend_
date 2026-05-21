@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import axios from '@/lib/axios'
+import { isAxiosError } from 'axios'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tag, Plus, Pencil, Trash2, Clock, X, Check } from 'lucide-react'
@@ -77,7 +78,7 @@ export default function ReferencesPage() {
       await fetchReferences()
       closeForm()
     } catch (err: unknown) {
-      const errorMessage = axios.isAxiosError(err) ? err.response?.data?.message : undefined
+      const errorMessage = isAxiosError(err) ? err.response?.data?.message : undefined
       setError(errorMessage ?? 'Une erreur est survenue')
     } finally {
       setSaving(false)
