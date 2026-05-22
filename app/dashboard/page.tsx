@@ -1,31 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import axios from '@/lib/axios'
 import { socket } from '@/lib/socket'
+import { useProductionStats } from '@/lib/useProductionStats'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { TrendingUp, Package, CheckCircle, XCircle, Trophy, AlertTriangle, Activity, Wifi, WifiOff } from 'lucide-react'
-
-interface OEE {
-  oee: number
-  qualite: number
-  disponibilite: number
-  performance: number
-  totalProduit: number
-  totalNonConforme: number
-}
-
-interface Production {
-  id: number
-  ouvrier: { prenom: string; nom: string }
-  quantiteProduite: number
-  quantiteConforme: number
-  quantiteNonConforme: number
-  reference: { id: number; code: string; libelle: string } | null
-  createdAt: string
-}
 
 interface OuvrierStat {
   nom: string
@@ -42,13 +23,15 @@ interface Notification {
 }
 
 export default function Dashboard() {
-  const [oee, setOee] = useState<OEE | null>(null)
-  const [productions, setProductions] = useState<Production[]>([])
+  const stats = useProductionStats(5000)
+  const { oee, qualite, totalProduit, totalNonConforme, productions } = stats
+  const oeeAlerte = oee !== null && oee < 50
+
   const [top5, setTop5] = useState<OuvrierStat[]>([])
   const [moins5, setMoins5] = useState<OuvrierStat[]>([])
   const [connected, setConnected] = useState(false)
   const [notifications, setNotifications] = useState<Notification[]>([])
-  const [oeeAlerte, setOeeAlerte] = useState(false)
+  const [alerteDismissed, setAlerteDismissed] = useState(false)
 
   const addNotification = (message: string, type: 'success' | 'error' | 'info') => {
     const id = Date.now() + Math.random()
@@ -59,65 +42,35 @@ export default function Dashboard() {
     }, 5000)
   }
 
-  const calculerStats = (prods: Production[]) => {
-    const stats: Record<string, OuvrierStat> = {}
-    prods.forEach((p) => {
+  useEffect(() => {
+    const s: Record<string, OuvrierStat> = {}
+    productions.forEach((p) => {
       if (!p.ouvrier) return
       const nom = `${p.ouvrier.prenom} ${p.ouvrier.nom}`
-      if (!stats[nom]) stats[nom] = { nom, produit: 0, nonConforme: 0, taux: 0 }
-      stats[nom].produit += p.quantiteProduite
-      stats[nom].nonConforme += p.quantiteNonConforme
+      if (!s[nom]) s[nom] = { nom, produit: 0, nonConforme: 0, taux: 0 }
+      s[nom].produit += p.quantiteProduite
+      s[nom].nonConforme += p.quantiteNonConforme
     })
-    Object.values(stats).forEach((s) => {
-      s.taux = s.produit > 0 ? ((s.produit - s.nonConforme) / s.produit) * 100 : 0
+    Object.values(s).forEach((x) => {
+      x.taux = x.produit > 0 ? ((x.produit - x.nonConforme) / x.produit) * 100 : 0
     })
-    const sorted = Object.values(stats).sort((a, b) => b.taux - a.taux)
+    const sorted = Object.values(s).sort((a, b) => b.taux - a.taux)
     setTop5(sorted.slice(0, 5))
     setMoins5([...sorted].sort((a, b) => a.taux - b.taux).slice(0, 5))
-  }
-
-  const fetchData = async () => {
-    try {
-      const [oeeRes, prodRes] = await Promise.all([
-        axios.get('/oee'),
-        axios.get('/production'),
-      ])
-      setOee(oeeRes.data)
-      setOeeAlerte(oeeRes.data.oee < 50)
-      setProductions(prodRes.data)
-      calculerStats(prodRes.data)
-    } catch (err) {
-      console.log('Erreur:', err)
-    }
-  }
+  }, [productions])
 
   useEffect(() => {
-    fetchData()
-
-    // Initialiser l'état connecté si le socket est déjà actif au montage
     if (socket.connected) setConnected(true)
 
-    const pollingInterval = setInterval(() => {
-      fetchData()
-    }, 5000)
-
-    // Références nommées pour un nettoyage précis sans affecter les autres composants
     const onConnect = () => {
       setConnected(true)
       addNotification('Connexion temps réel établie', 'success')
     }
-
     const onDisconnect = () => {
       setConnected(false)
       addNotification('Connexion temps réel perdue — polling actif', 'info')
     }
-
-    const onNouvelleProduction = (production: Production) => {
-      setProductions(prev => {
-        const updated = [production, ...prev]
-        calculerStats(updated)
-        return updated
-      })
+    const onNouvelleProduction = (production: { ouvrier?: { prenom: string; nom: string }; quantiteNonConforme: number; quantiteProduite: number }) => {
       const nom = production.ouvrier
         ? `${production.ouvrier.prenom} ${production.ouvrier.nom}`
         : 'Ouvrier'
@@ -128,12 +81,6 @@ export default function Dashboard() {
         production.quantiteNonConforme > 0 ? 'error' : 'success'
       )
     }
-
-    const onOeeUpdate = (data: OEE) => {
-      setOee(data)
-      setOeeAlerte(data.oee < 50)
-    }
-
     const onPresenceOuvrier = (ouvrier: { prenom: string; nom: string }) => {
       addNotification(`${ouvrier.prenom} ${ouvrier.nom} a scanné son badge`, 'info')
     }
@@ -141,16 +88,12 @@ export default function Dashboard() {
     socket.on('connect', onConnect)
     socket.on('disconnect', onDisconnect)
     socket.on('nouvelle_production', onNouvelleProduction)
-    socket.on('oee_update', onOeeUpdate)
     socket.on('presence_ouvrier', onPresenceOuvrier)
 
     return () => {
-      clearInterval(pollingInterval)
-      // Supprimer uniquement nos propres listeners
       socket.off('connect', onConnect)
       socket.off('disconnect', onDisconnect)
       socket.off('nouvelle_production', onNouvelleProduction)
-      socket.off('oee_update', onOeeUpdate)
       socket.off('presence_ouvrier', onPresenceOuvrier)
     }
   }, [])
@@ -160,6 +103,12 @@ export default function Dashboard() {
     produit: p.quantiteProduite,
     conforme: p.quantiteConforme,
   }))
+
+  if (stats.loading) return (
+    <div className="flex items-center justify-center h-64">
+      <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+  )
 
   return (
     <div className="flex flex-col gap-6">
@@ -184,7 +133,7 @@ export default function Dashboard() {
       </div>
 
       {/* Alerte OEE critique */}
-      {oeeAlerte && (
+      {oeeAlerte && !alerteDismissed && (
         <div className="flex items-center gap-3 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 animate-in slide-in-from-top-2">
           <div className="w-9 h-9 bg-red-100 rounded-xl flex items-center justify-center shrink-0">
             <AlertTriangle size={20} className="text-red-600 animate-pulse" />
@@ -192,11 +141,11 @@ export default function Dashboard() {
           <div className="flex-1">
             <p className="font-semibold text-sm">OEE critique — Performance insuffisante</p>
             <p className="text-xs text-red-500 mt-0.5">
-              L&apos;OEE est à <span className="font-bold">{oee?.oee ?? 0}%</span>, en dessous du seuil critique de 50%. Vérifiez la cadence et la qualité de production.
+              L&apos;OEE est à <span className="font-bold">{oee ?? 0}%</span>, en dessous du seuil critique de 50%. Vérifiez la cadence et la qualité de production.
             </p>
           </div>
           <button
-            onClick={() => setOeeAlerte(false)}
+            onClick={() => setAlerteDismissed(true)}
             className="text-red-400 hover:text-red-600 text-lg leading-none px-1"
           >
             ×
@@ -238,7 +187,7 @@ export default function Dashboard() {
               </div>
             </div>
             <p className={`text-3xl font-bold ${oeeAlerte ? 'text-red-600' : 'text-blue-700'}`}>
-              {oee?.oee ?? '—'}{oee !== null ? '%' : ''}
+              {oee != null ? `${oee}%` : '—'}
             </p>
             <p className={`text-xs mt-1 ${oeeAlerte ? 'text-red-400' : 'text-blue-400'}`}>
               {oeeAlerte ? '⚠ En dessous du seuil (50%)' : 'Efficacité globale'}
@@ -254,7 +203,7 @@ export default function Dashboard() {
                 <Package size={18} className="text-zinc-600" />
               </div>
             </div>
-            <p className="text-3xl font-bold text-zinc-800">{productions.reduce((s, p) => s + p.quantiteProduite, 0)}</p>
+            <p className="text-3xl font-bold text-zinc-800">{totalProduit}</p>
             <p className="text-xs text-zinc-400 mt-1">Unités fabriquées</p>
           </CardContent>
         </Card>
@@ -267,7 +216,7 @@ export default function Dashboard() {
                 <CheckCircle size={18} className="text-emerald-600" />
               </div>
             </div>
-            <p className="text-3xl font-bold text-emerald-700">{oee?.qualite ?? '—'}</p>
+            <p className="text-3xl font-bold text-emerald-700">{qualite != null ? `${qualite}%` : '—'}</p>
             <p className="text-xs text-emerald-400 mt-1">Taux de conformité</p>
           </CardContent>
         </Card>
@@ -280,7 +229,7 @@ export default function Dashboard() {
                 <XCircle size={18} className="text-red-600" />
               </div>
             </div>
-            <p className="text-3xl font-bold text-red-600">{productions.reduce((s, p) => s + p.quantiteNonConforme, 0)}</p>
+            <p className="text-3xl font-bold text-red-600">{totalNonConforme}</p>
             <p className="text-xs text-red-400 mt-1">Unités rejetées</p>
           </CardContent>
         </Card>

@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
-import axios from '@/lib/axios'
+import { useRef, useState } from 'react'
+import { useProductionStats } from '@/lib/useProductionStats'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -10,51 +10,12 @@ import {
 } from 'recharts'
 import { Download, TrendingUp, Package, CheckCircle, XCircle, FileText } from 'lucide-react'
 
-interface OEE {
-  oee: number
-  qualite: number
-  disponibilite: number
-  performance: number
-  totalProduit: number
-  totalNonConforme: number
-}
-
-interface Production {
-  id: number
-  ouvrier: { prenom: string; nom: string }
-  quantiteProduite: number
-  quantiteConforme: number
-  quantiteNonConforme: number
-  reference: { id: number; code: string; libelle: string } | null
-  createdAt: string
-}
-
 const COLORS = ['#22c55e', '#ef4444', '#3b82f6', '#f59e0b']
 
 export default function Rapports() {
-  const [oee, setOee] = useState<OEE | null>(null)
-  const [productions, setProductions] = useState<Production[]>([])
-  const [loading, setLoading] = useState(true)
+  const { oee, qualite, disponibilite, performance, totalProduit, totalConforme, totalNonConforme, productions, loading } = useProductionStats()
   const [csvSuccess, setCsvSuccess] = useState(false)
   const reportRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [oeeRes, prodRes] = await Promise.all([
-          axios.get('/oee'),
-          axios.get('/production'),
-        ])
-        setOee(oeeRes.data)
-        setProductions(prodRes.data)
-      } catch (err) {
-        console.log('Erreur:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchData()
-  }, [])
 
 
   // ─── Export CSV ────────────────────────────────────────────────────────────
@@ -89,12 +50,12 @@ export default function Rapports() {
     const summary = [
       [''],
       ['=== Indicateurs OEE ==='],
-      ['OEE Global',          oee?.oee              ?? ''],
-      ['Disponibilité',       oee?.disponibilite    ?? ''],
-      ['Performance',         oee?.performance      ?? ''],
-      ['Qualité',             oee?.qualite          ?? ''],
-      ['Total produit',       oee?.totalProduit     ?? ''],
-      ['Total non conformes', oee?.totalNonConforme ?? ''],
+      ['OEE Global',          oee              ?? ''],
+      ['Disponibilité',       disponibilite    ?? ''],
+      ['Performance',         performance      ?? ''],
+      ['Qualité',             qualite          ?? ''],
+      ['Total produit',       totalProduit],
+      ['Total non conformes', totalNonConforme],
     ]
 
     // Guillemets RFC 4180 — protège les virgules et les guillemets internes
@@ -134,15 +95,15 @@ export default function Rapports() {
   }))
 
   const dataQualite = [
-    { name: 'Conformes',     value: productions.reduce((s, p) => s + p.quantiteConforme,    0) },
-    { name: 'Non conformes', value: productions.reduce((s, p) => s + p.quantiteNonConforme, 0) },
+    { name: 'Conformes',     value: totalConforme },
+    { name: 'Non conformes', value: totalNonConforme },
   ]
 
   const dataOEE = [
-    { name: 'Disponibilité', value: parseFloat(oee?.disponibilite ?? '0') },
-    { name: 'Performance',   value: parseFloat(oee?.performance   ?? '0') },
-    { name: 'Qualité',       value: parseFloat(oee?.qualite       ?? '0') },
-    { name: 'OEE Global',    value: parseFloat(oee?.oee           ?? '0') },
+    { name: 'Disponibilité', value: disponibilite ?? 0 },
+    { name: 'Performance',   value: performance   ?? 0 },
+    { name: 'Qualité',       value: qualite       ?? 0 },
+    { name: 'OEE Global',    value: oee           ?? 0 },
   ]
 
   // ─── Loader ────────────────────────────────────────────────────────────────
@@ -207,7 +168,7 @@ export default function Rapports() {
                 <p className="text-xs text-blue-500 uppercase tracking-wide font-semibold">OEE Global</p>
                 <TrendingUp size={18} className="text-blue-600" />
               </div>
-              <p className="text-3xl font-bold text-blue-700">{oee?.oee != null ? `${oee.oee}%` : '—'}</p>
+              <p className="text-3xl font-bold text-blue-700">{oee != null ? `${oee}%` : '—'}</p>
             </CardContent>
           </Card>
 
@@ -217,7 +178,7 @@ export default function Rapports() {
                 <p className="text-xs text-zinc-500 uppercase tracking-wide font-semibold">Total produit</p>
                 <Package size={18} className="text-zinc-600" />
               </div>
-              <p className="text-3xl font-bold text-zinc-800">{productions.reduce((s, p) => s + p.quantiteProduite, 0)}</p>
+              <p className="text-3xl font-bold text-zinc-800">{totalProduit}</p>
             </CardContent>
           </Card>
 
@@ -227,7 +188,7 @@ export default function Rapports() {
                 <p className="text-xs text-emerald-500 uppercase tracking-wide font-semibold">Qualité</p>
                 <CheckCircle size={18} className="text-emerald-600" />
               </div>
-              <p className="text-3xl font-bold text-emerald-700">{oee?.qualite != null ? `${oee.qualite}%` : '—'}</p>
+              <p className="text-3xl font-bold text-emerald-700">{qualite != null ? `${qualite}%` : '—'}</p>
             </CardContent>
           </Card>
 
@@ -237,7 +198,7 @@ export default function Rapports() {
                 <p className="text-xs text-red-500 uppercase tracking-wide font-semibold">Non conformes</p>
                 <XCircle size={18} className="text-red-600" />
               </div>
-              <p className="text-3xl font-bold text-red-600">{productions.reduce((s, p) => s + p.quantiteNonConforme, 0)}</p>
+              <p className="text-3xl font-bold text-red-600">{totalNonConforme}</p>
             </CardContent>
           </Card>
         </div>

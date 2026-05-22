@@ -1,25 +1,8 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
-import axios from '@/lib/axios'
+import { useProductionStats } from '@/lib/useProductionStats'
 import { Monitor, RefreshCw, Building2, CheckCircle, Save, Maximize, Minimize, Settings, Users, Activity } from 'lucide-react'
-
-interface OEE {
-  oee: string
-  qualite: string
-  totalProduit: number
-  totalNonConforme: number
-}
-
-interface Production {
-  id: number
-  ouvrier: { prenom: string; nom: string; departement: string }
-  quantiteProduite: number
-  quantiteConforme: number
-  quantiteNonConforme: number
-  reference: { id: number; code: string; libelle: string } | null
-  createdAt: string
-}
 
 interface OuvrierStat {
   nom: string
@@ -39,16 +22,6 @@ interface TVConfig {
 }
 
 export default function EcranTV() {
-  const [oee, setOee] = useState<OEE | null>(null)
-  const [top5, setTop5] = useState<OuvrierStat[]>([])
-  const [productions, setProductions] = useState<Production[]>([])
-  const [heure, setHeure] = useState('')
-  const [date, setDate] = useState('')
-  const [isFullscreen, setIsFullscreen] = useState(false)
-  const [showConfig, setShowConfig] = useState(false)
-  const [configSaved, setConfigSaved] = useState(false)
-  const containerRef = useRef<HTMLDivElement>(null)
-
   const [tvConfig, setTvConfig] = useState<TVConfig>({
     refresh: '30',
     departement: 'Tous',
@@ -60,47 +33,39 @@ export default function EcranTV() {
 
   useEffect(() => {
     const saved = localStorage.getItem('tvConfig')
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (saved) setTvConfig(JSON.parse(saved))
   }, [])
 
-  const fetchData = async () => {
-    try {
-      const [oeeRes, prodRes] = await Promise.all([
-        axios.get('/oee'),
-        axios.get('/production'),
-      ])
-      setOee(oeeRes.data)
-      const prods: Production[] = prodRes.data
-      setProductions(prods.slice(0, 6))
+  const refreshMs = parseInt(tvConfig.refresh) * 1000
+  const { oee, qualite, totalProduit, totalNonConforme, productions } = useProductionStats(refreshMs)
 
-      const stats: Record<string, OuvrierStat> = {}
-      prods.forEach((p) => {
-        if (!p.ouvrier) return
-        const nom = `${p.ouvrier.prenom} ${p.ouvrier.nom}`
-        if (!stats[nom]) {
-          stats[nom] = { nom, produit: 0, nonConforme: 0, taux: 0, departement: p.ouvrier.departement }
-        }
-        stats[nom].produit += p.quantiteProduite
-        stats[nom].nonConforme += p.quantiteNonConforme
-      })
-
-      Object.values(stats).forEach((s) => {
-        s.taux = s.produit > 0 ? ((s.produit - s.nonConforme) / s.produit) * 100 : 0
-      })
-
-      const sorted = Object.values(stats).sort((a, b) => b.taux - a.taux)
-      setTop5(sorted.slice(0, 5))
-    } catch (err) {
-      console.log('Erreur:', err)
-    }
-  }
+  const [top5, setTop5] = useState<OuvrierStat[]>([])
+  const [heure, setHeure] = useState('')
+  const [date, setDate] = useState('')
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [showConfig, setShowConfig] = useState(false)
+  const [configSaved, setConfigSaved] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchData()
-    const refreshMs = parseInt(tvConfig.refresh) * 1000
-    const dataInterval = setInterval(fetchData, refreshMs)
+    const stats: Record<string, OuvrierStat> = {}
+    productions.forEach((p) => {
+      if (!p.ouvrier) return
+      const nom = `${p.ouvrier.prenom} ${p.ouvrier.nom}`
+      if (!stats[nom]) {
+        stats[nom] = { nom, produit: 0, nonConforme: 0, taux: 0, departement: p.ouvrier.departement ?? '' }
+      }
+      stats[nom].produit += p.quantiteProduite
+      stats[nom].nonConforme += p.quantiteNonConforme
+    })
+    Object.values(stats).forEach((s) => {
+      s.taux = s.produit > 0 ? ((s.produit - s.nonConforme) / s.produit) * 100 : 0
+    })
+    const sorted = Object.values(stats).sort((a, b) => b.taux - a.taux)
+    setTop5(sorted.slice(0, 5))
+  }, [productions])
+
+  useEffect(() => {
     const heureInterval = setInterval(() => {
       const now = new Date()
       setHeure(now.toLocaleTimeString('fr-FR'))
@@ -108,11 +73,8 @@ export default function EcranTV() {
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
       }))
     }, 1000)
-    return () => {
-      clearInterval(dataInterval)
-      clearInterval(heureInterval)
-    }
-  }, [tvConfig.refresh])
+    return () => clearInterval(heureInterval)
+  }, [])
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -293,15 +255,15 @@ export default function EcranTV() {
         {tvConfig.afficherOEE && !tvConfig.afficherKPIs && (
           <div className="bg-zinc-800 rounded-2xl p-12 text-center border-2 border-blue-600 shadow-lg shadow-blue-900/20">
             <p className="text-zinc-400 text-2xl uppercase tracking-[0.3em] mb-6">OEE Global de Production</p>
-            <p className="text-[12rem] font-black text-blue-400 leading-none">{oee?.oee ?? '—'}</p>
+            <p className="text-[12rem] font-black text-blue-400 leading-none">{oee != null ? `${oee}%` : '—'}</p>
             <div className="mt-8 flex justify-center gap-12">
                <div className="text-center">
                   <p className="text-zinc-500 text-lg">Qualité</p>
-                  <p className="text-3xl font-bold text-emerald-400">{oee?.qualite ?? '—'}</p>
+                  <p className="text-3xl font-bold text-emerald-400">{qualite != null ? `${qualite}%` : '—'}</p>
                </div>
                <div className="text-center">
                   <p className="text-zinc-500 text-lg">Total Produit</p>
-                  <p className="text-3xl font-bold text-white">{oee?.totalProduit ?? '—'}</p>
+                  <p className="text-3xl font-bold text-white">{totalProduit}</p>
                </div>
             </div>
           </div>
@@ -312,19 +274,19 @@ export default function EcranTV() {
           <div className="grid grid-cols-4 gap-4">
             <div className="bg-zinc-800 rounded-2xl p-6 text-center border border-zinc-700">
               <p className="text-zinc-400 text-sm uppercase tracking-widest mb-2">OEE Global</p>
-              <p className="text-5xl font-bold text-blue-400">{oee?.oee ?? '—'}</p>
+              <p className="text-5xl font-bold text-blue-400">{oee != null ? `${oee}%` : '—'}</p>
             </div>
             <div className="bg-zinc-800 rounded-2xl p-6 text-center border border-zinc-700">
               <p className="text-zinc-400 text-sm uppercase tracking-widest mb-2">Total Produit</p>
-              <p className="text-5xl font-bold text-white">{oee?.totalProduit ?? '—'}</p>
+              <p className="text-5xl font-bold text-white">{totalProduit}</p>
             </div>
             <div className="bg-zinc-800 rounded-2xl p-6 text-center border border-zinc-700">
               <p className="text-zinc-400 text-sm uppercase tracking-widest mb-2">Qualité</p>
-              <p className="text-5xl font-bold text-emerald-400">{oee?.qualite ?? '—'}</p>
+              <p className="text-5xl font-bold text-emerald-400">{qualite != null ? `${qualite}%` : '—'}</p>
             </div>
             <div className="bg-zinc-800 rounded-2xl p-6 text-center border border-zinc-700">
               <p className="text-zinc-400 text-sm uppercase tracking-widest mb-2">Non Conformes</p>
-              <p className="text-5xl font-bold text-red-400">{oee?.totalNonConforme ?? '—'}</p>
+              <p className="text-5xl font-bold text-red-400">{totalNonConforme}</p>
             </div>
           </div>
         )}
@@ -372,7 +334,7 @@ export default function EcranTV() {
                 Productions récentes
               </p>
               <div className="flex flex-col gap-3">
-                {productions.map((p) => (
+                {productions.slice(0, 6).map((p) => (
                   <div key={p.id} className="flex items-center justify-between bg-zinc-700 rounded-xl px-4 py-3">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-zinc-600 rounded-full flex items-center justify-center">
