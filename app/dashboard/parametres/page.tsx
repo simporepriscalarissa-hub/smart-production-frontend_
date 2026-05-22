@@ -9,7 +9,6 @@ export default function Parametres() {
   const [message, setMessage] = useState('')
   const [form, setForm] = useState({
     entreprise: APP_CONFIG.entreprise,
-    apiUrl: APP_CONFIG.apiUrl,
     unite: APP_CONFIG.unite,
   })
 
@@ -58,15 +57,6 @@ export default function Parametres() {
                 type="text"
                 value={form.unite}
                 onChange={(e) => setForm({ ...form, unite: e.target.value })}
-                className="w-full border border-zinc-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="col-span-2">
-              <label className="text-sm text-zinc-600 mb-1.5 block font-medium">URL de l&apos;API</label>
-              <input
-                type="text"
-                value={form.apiUrl}
-                onChange={(e) => setForm({ ...form, apiUrl: e.target.value })}
                 className="w-full border border-zinc-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>

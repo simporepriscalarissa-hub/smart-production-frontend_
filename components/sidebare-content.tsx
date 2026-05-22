@@ -6,11 +6,19 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { APP_CONFIG } from "@/lib/config"
 import { useEffect, useState } from "react"
 import Image from "next/image"
+import axios from "@/lib/axios"
 import {
   LayoutDashboard, Factory, Users, UserCog,
   Building2, BarChart3, Tv, Settings, LogOut, Eye,
   X, Tag,
 } from "lucide-react"
+
+interface Reference {
+  id: number
+  code: string
+  libelle: string
+  tempsCycle: number
+}
 
 const menuAdmin = [
   { label: "Tableau de bord", href: "/dashboard", icon: LayoutDashboard },
@@ -42,6 +50,7 @@ export default function SidebarContent({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname()
   const [user, setUser] = useState<UserData | null>(null)
   const [mounted, setMounted] = useState(false)
+  const [references, setReferences] = useState<Reference[]>([])
 
   useEffect(() => {
     const userData = localStorage.getItem('user')
@@ -50,6 +59,7 @@ export default function SidebarContent({ onClose }: { onClose?: () => void }) {
       setUser(JSON.parse(userData))
     }
     setMounted(true)
+    axios.get('/references').then(res => setReferences(res.data)).catch(() => {})
   }, [])
 
   if (!mounted) return null
@@ -122,6 +132,24 @@ export default function SidebarContent({ onClose }: { onClose?: () => void }) {
         </div>
 
       </ScrollArea>
+
+      {/* Références produit */}
+      {user?.role === 'admin' && references.length > 0 && (
+        <div className="px-4 pb-3">
+          <p className="text-xs text-zinc-400 mb-2 uppercase tracking-wider px-1">Références actives</p>
+          <div className="flex flex-col gap-1">
+            {references.map(ref => (
+              <div key={ref.id} className="flex items-center justify-between px-3 py-1.5 rounded-lg bg-zinc-50">
+                <div className="flex items-center gap-2">
+                  <Tag size={12} className="text-blue-500" />
+                  <span className="text-xs font-mono font-medium text-zinc-700">{ref.code}</span>
+                </div>
+                <span className="text-[10px] text-zinc-400">{ref.tempsCycle}s</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Footer utilisateur */}
       <div className="border-t p-4">
