@@ -36,7 +36,7 @@ export default function Rapports() {
     const rows = productions.map(p => [
       p.ouvrier?.prenom ?? '',
       p.ouvrier?.nom    ?? '',
-      p.reference?.code ?? '—',
+      p.reference?.code ?? '-',
       p.quantiteProduite,
       p.quantiteConforme,
       p.quantiteNonConforme,
@@ -58,7 +58,7 @@ export default function Rapports() {
       ['Total non conformes', totalNonConforme],
     ]
 
-    // Guillemets RFC 4180 — protège les virgules et les guillemets internes
+    // Guillemets RFC 4180 - protège les virgules et les guillemets internes
     const escape = (val: string | number) =>
       `"${String(val).replace(/"/g, '""')}"`
 
@@ -68,7 +68,7 @@ export default function Rapports() {
       ...summary.map(r => r.map(escape).join(',')),
     ].join('\n')
 
-    // BOM UTF-8 (\uFEFF) — indispensable pour que Excel affiche les accents
+    // BOM UTF-8 (\uFEFF) - indispensable pour que Excel affiche les accents
     const blob = new Blob(['\uFEFF' + csvContent], {
       type: 'text/csv;charset=utf-8;',
     })
@@ -122,7 +122,7 @@ export default function Rapports() {
         <div>
           <h2 className="text-2xl font-bold text-zinc-800">Rapports de production</h2>
           <p className="text-sm text-zinc-500">
-            Analyse complète — {new Date().toLocaleDateString('fr-FR')}
+            Analyse complète - {new Date().toLocaleDateString('fr-FR')}
           </p>
         </div>
 
@@ -155,7 +155,7 @@ export default function Rapports() {
           <div className="flex items-center gap-3 mb-2">
             <FileText size={24} />
             <h3 className="text-xl font-bold">
-              Rapport de Production — Smart Production Counter
+              Rapport de Production - Smart Production Counter
             </h3>
           </div>
         </div>
@@ -168,7 +168,7 @@ export default function Rapports() {
                 <p className="text-xs text-blue-500 uppercase tracking-wide font-semibold">OEE Global</p>
                 <TrendingUp size={18} className="text-blue-600" />
               </div>
-              <p className="text-3xl font-bold text-blue-700">{oee != null ? `${oee}%` : '—'}</p>
+              <p className="text-3xl font-bold text-blue-700">{oee != null ? `${oee}%` : '-'}</p>
             </CardContent>
           </Card>
 
@@ -188,7 +188,7 @@ export default function Rapports() {
                 <p className="text-xs text-emerald-500 uppercase tracking-wide font-semibold">Qualité</p>
                 <CheckCircle size={18} className="text-emerald-600" />
               </div>
-              <p className="text-3xl font-bold text-emerald-700">{qualite != null ? `${qualite}%` : '—'}</p>
+              <p className="text-3xl font-bold text-emerald-700">{qualite != null ? `${qualite}%` : '-'}</p>
             </CardContent>
           </Card>
 
@@ -259,7 +259,7 @@ export default function Rapports() {
             </CardContent>
           </Card>
 
-          {/* Graphique productions par ouvrier — pleine largeur */}
+          {/* Graphique productions par ouvrier - pleine largeur */}
           <Card className="shadow-sm border border-zinc-100 md:col-span-2">
             <CardHeader className="pb-2">
               <CardTitle className="text-base">Productions par ouvrier</CardTitle>
@@ -313,7 +313,7 @@ export default function Rapports() {
                         </td>
                         <td className="py-2">
                           <Badge className="bg-blue-50 text-blue-600 hover:bg-blue-50">
-                            {p.reference?.code ?? '—'}
+                            {p.reference?.code ?? '-'}
                           </Badge>
                         </td>
                         <td className="py-2 font-bold">{p.quantiteProduite}</td>

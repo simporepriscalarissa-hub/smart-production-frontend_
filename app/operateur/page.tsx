@@ -211,7 +211,7 @@ export default function Operateur() {
                   <tr key={p.id} className="border-b hover:bg-zinc-50 transition-colors">
                     <td className="py-3 px-5">
                       <Badge className="bg-blue-50 text-blue-600 hover:bg-blue-50 font-mono">
-                        {p.reference?.code ?? '—'}
+                        {p.reference?.code ?? '-'}
                       </Badge>
                     </td>
                     <td className="py-3 font-bold">{p.quantiteProduite}</td>

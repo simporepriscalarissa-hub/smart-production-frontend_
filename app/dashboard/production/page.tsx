@@ -182,7 +182,7 @@ export default function Production() {
           <p className="text-sm text-zinc-500">Gérez les enregistrements de production et la qualité</p>
         </div>
         <div className="flex flex-wrap gap-3">
-          {/* Superviseur — signaler non conformes */}
+          {/* Superviseur - signaler non conformes */}
           {isSuperviseur && (
             <button
               onClick={() => { setShowFormNonConforme(!showFormNonConforme); setShowForm(false) }}
@@ -192,7 +192,7 @@ export default function Production() {
               Signaler non conformes
             </button>
           )}
-          {/* Admin — ajouter production complète */}
+          {/* Admin - ajouter production complète */}
           {isAdmin && (
             <button
               onClick={() => { setShowForm(!showForm); setShowFormNonConforme(false) }}
@@ -255,7 +255,7 @@ export default function Production() {
         </div>
       )}
 
-      {/* Formulaire Admin — production complète */}
+      {/* Formulaire Admin - production complète */}
       {showForm && isAdmin && (
         <Card className="border border-blue-100 shadow-sm">
           <CardHeader className="pb-2">
@@ -315,7 +315,7 @@ export default function Production() {
         </Card>
       )}
 
-      {/* Formulaire Superviseur — pièces non conformes */}
+      {/* Formulaire Superviseur - pièces non conformes */}
       {showFormNonConforme && isSuperviseur && (
         <Card className="border border-red-100 shadow-sm">
           <CardHeader className="pb-2">
@@ -425,7 +425,7 @@ export default function Production() {
                       </div>
                     </td>
                     <td className="py-3">
-                      <Badge className="bg-blue-50 text-blue-600 hover:bg-blue-50 font-normal">{p.reference?.code ?? '—'}</Badge>
+                      <Badge className="bg-blue-50 text-blue-600 hover:bg-blue-50 font-normal">{p.reference?.code ?? '-'}</Badge>
                     </td>
                     <td className="py-3 font-bold">{p.quantiteProduite}</td>
                     <td className="py-3 text-emerald-600 font-bold">{p.quantiteConforme}</td>

@@ -25,7 +25,7 @@ interface Notification {
 export default function Dashboard() {
   const stats = useProductionStats(5000)
   const { oee, qualite, totalProduit, totalNonConforme, productions } = stats
-  const oeeAlerte = oee !== null && oee < 50
+  const oeeAlerte = oee !== null && oee < 50 && totalProduit > 0
 
   const [top5, setTop5] = useState<OuvrierStat[]>([])
   const [moins5, setMoins5] = useState<OuvrierStat[]>([])
@@ -68,7 +68,7 @@ export default function Dashboard() {
     }
     const onDisconnect = () => {
       setConnected(false)
-      addNotification('Connexion temps réel perdue — polling actif', 'info')
+      addNotification('Connexion temps réel perdue - polling actif', 'info')
     }
     const onNouvelleProduction = (production: { ouvrier?: { prenom: string; nom: string }; quantiteNonConforme: number; quantiteProduite: number }) => {
       const nom = production.ouvrier
@@ -76,8 +76,8 @@ export default function Dashboard() {
         : 'Ouvrier'
       addNotification(
         production.quantiteNonConforme > 0
-          ? `${nom} — ${production.quantiteNonConforme} pièce(s) NOK`
-          : `${nom} — ${production.quantiteProduite} pièce(s) conformes`,
+          ? `${nom} - ${production.quantiteNonConforme} pièce(s) NOK`
+          : `${nom} - ${production.quantiteProduite} pièce(s) conformes`,
         production.quantiteNonConforme > 0 ? 'error' : 'success'
       )
     }
@@ -139,7 +139,7 @@ export default function Dashboard() {
             <AlertTriangle size={20} className="text-red-600 animate-pulse" />
           </div>
           <div className="flex-1">
-            <p className="font-semibold text-sm">OEE critique — Performance insuffisante</p>
+            <p className="font-semibold text-sm">OEE critique - Performance insuffisante</p>
             <p className="text-xs text-red-500 mt-0.5">
               L&apos;OEE est à <span className="font-bold">{oee ?? 0}%</span>, en dessous du seuil critique de 50%. Vérifiez la cadence et la qualité de production.
             </p>
@@ -187,7 +187,7 @@ export default function Dashboard() {
               </div>
             </div>
             <p className={`text-3xl font-bold ${oeeAlerte ? 'text-red-600' : 'text-blue-700'}`}>
-              {oee != null ? `${oee}%` : '—'}
+              {oee != null ? `${oee}%` : '-'}
             </p>
             <p className={`text-xs mt-1 ${oeeAlerte ? 'text-red-400' : 'text-blue-400'}`}>
               {oeeAlerte ? '⚠ En dessous du seuil (50%)' : 'Efficacité globale'}
@@ -216,7 +216,7 @@ export default function Dashboard() {
                 <CheckCircle size={18} className="text-emerald-600" />
               </div>
             </div>
-            <p className="text-3xl font-bold text-emerald-700">{qualite != null ? `${qualite}%` : '—'}</p>
+            <p className="text-3xl font-bold text-emerald-700">{qualite != null ? `${qualite}%` : '-'}</p>
             <p className="text-xs text-emerald-400 mt-1">Taux de conformité</p>
           </CardContent>
         </Card>
@@ -268,7 +268,7 @@ export default function Dashboard() {
           <CardHeader className="pb-2">
             <div className="flex items-center gap-2">
               <Trophy size={18} className="text-yellow-500" />
-              <CardTitle className="text-base">Top 5 — Les plus performants</CardTitle>
+              <CardTitle className="text-base">Top 5 - Les plus performants</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
@@ -374,7 +374,7 @@ export default function Dashboard() {
                     <td className="py-3 font-medium">{p.ouvrier?.prenom} {p.ouvrier?.nom}</td>
                     <td className="py-3">
                       <Badge className="bg-blue-50 text-blue-600 hover:bg-blue-50 font-mono">
-                        {p.reference?.code ?? '—'}
+                        {p.reference?.code ?? '-'}
                       </Badge>
                     </td>
                     <td className="py-3 font-bold">{p.quantiteProduite}</td>

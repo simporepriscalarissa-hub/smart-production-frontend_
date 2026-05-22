@@ -231,7 +231,7 @@ export default function EcranTV() {
               <p className="text-xl font-bold text-white">Smart Production Counter</p>
               <p className="text-sm text-zinc-400">
                 Surveillance en temps réel
-                {tvConfig.departement !== 'Tous' && ` — ${tvConfig.departement}`}
+                {tvConfig.departement !== 'Tous' && ` - ${tvConfig.departement}`}
               </p>
             </div>
           </div>
@@ -255,11 +255,11 @@ export default function EcranTV() {
         {tvConfig.afficherOEE && !tvConfig.afficherKPIs && (
           <div className="bg-zinc-800 rounded-2xl p-12 text-center border-2 border-blue-600 shadow-lg shadow-blue-900/20">
             <p className="text-zinc-400 text-2xl uppercase tracking-[0.3em] mb-6">OEE Global de Production</p>
-            <p className="text-[12rem] font-black text-blue-400 leading-none">{oee != null ? `${oee}%` : '—'}</p>
+            <p className="text-[12rem] font-black text-blue-400 leading-none">{oee != null ? `${oee}%` : '-'}</p>
             <div className="mt-8 flex justify-center gap-12">
                <div className="text-center">
                   <p className="text-zinc-500 text-lg">Qualité</p>
-                  <p className="text-3xl font-bold text-emerald-400">{qualite != null ? `${qualite}%` : '—'}</p>
+                  <p className="text-3xl font-bold text-emerald-400">{qualite != null ? `${qualite}%` : '-'}</p>
                </div>
                <div className="text-center">
                   <p className="text-zinc-500 text-lg">Total Produit</p>
@@ -274,7 +274,7 @@ export default function EcranTV() {
           <div className="grid grid-cols-4 gap-4">
             <div className="bg-zinc-800 rounded-2xl p-6 text-center border border-zinc-700">
               <p className="text-zinc-400 text-sm uppercase tracking-widest mb-2">OEE Global</p>
-              <p className="text-5xl font-bold text-blue-400">{oee != null ? `${oee}%` : '—'}</p>
+              <p className="text-5xl font-bold text-blue-400">{oee != null ? `${oee}%` : '-'}</p>
             </div>
             <div className="bg-zinc-800 rounded-2xl p-6 text-center border border-zinc-700">
               <p className="text-zinc-400 text-sm uppercase tracking-widest mb-2">Total Produit</p>
@@ -282,7 +282,7 @@ export default function EcranTV() {
             </div>
             <div className="bg-zinc-800 rounded-2xl p-6 text-center border border-zinc-700">
               <p className="text-zinc-400 text-sm uppercase tracking-widest mb-2">Qualité</p>
-              <p className="text-5xl font-bold text-emerald-400">{qualite != null ? `${qualite}%` : '—'}</p>
+              <p className="text-5xl font-bold text-emerald-400">{qualite != null ? `${qualite}%` : '-'}</p>
             </div>
             <div className="bg-zinc-800 rounded-2xl p-6 text-center border border-zinc-700">
               <p className="text-zinc-400 text-sm uppercase tracking-widest mb-2">Non Conformes</p>
@@ -298,7 +298,7 @@ export default function EcranTV() {
             <div className="bg-zinc-800 rounded-2xl p-6 border border-zinc-700">
               <p className="text-lg font-bold text-yellow-500 mb-4 flex items-center gap-2">
                 <Users size={20} />
-                TOP 5 — Performance
+                TOP 5 - Performance
               </p>
               <div className="flex flex-col gap-3">
                 {top5.map((o, i) => (
@@ -344,7 +344,7 @@ export default function EcranTV() {
                       </div>
                       <div>
                         <p className="font-semibold text-white">{p.ouvrier?.prenom} {p.ouvrier?.nom}</p>
-                        <p className="text-xs text-zinc-400">{p.reference?.code ?? '—'}</p>
+                        <p className="text-xs text-zinc-400">{p.reference?.code ?? '-'}</p>
                       </div>
                     </div>
                     <div className="text-right">

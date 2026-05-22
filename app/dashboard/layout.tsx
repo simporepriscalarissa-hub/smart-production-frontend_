@@ -38,9 +38,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       }
     }
 
-    const onOeeUpdate = (data: { oee: number }) => {
+    const onOeeUpdate = (data: { oee: number; totalProduit?: number }) => {
       setOeeValeur(data.oee)
-      setOeeAlerte(data.oee < 50)
+      setOeeAlerte(data.oee < 50 && (data.totalProduit ?? 0) > 0)
     }
     socket.on('oee_update', onOeeUpdate)
 
@@ -70,7 +70,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           />
         )}
 
-        {/* Sidebar — fixe sur desktop, drawer sur mobile */}
+        {/* Sidebar - fixe sur desktop, drawer sur mobile */}
         <aside className={`
           fixed md:static inset-y-0 left-0 z-30
           w-64 border-r bg-white shadow-sm flex-shrink-0
@@ -126,7 +126,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         <div>
                           <p className="text-sm font-semibold text-red-700">OEE critique</p>
                           <p className="text-xs text-red-500 mt-0.5">
-                            OEE à <span className="font-bold">{oeeValeur}%</span> — en dessous du seuil de 50%
+                            OEE à <span className="font-bold">{oeeValeur}%</span> - en dessous du seuil de 50%
                           </p>
                         </div>
                       </div>

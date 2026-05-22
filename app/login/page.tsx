@@ -67,7 +67,7 @@ export default function Login() {
           </div>
         </div>
 
-        <p className="text-blue-300 text-xs">© 2026 Readdlytech — Tous droits réservés</p>
+        <p className="text-blue-300 text-xs">© 2026 Readdlytech - Tous droits réservés</p>
       </div>
 
       {/* Côté droit */}
@@ -84,7 +84,7 @@ export default function Login() {
           <div className="hidden lg:flex items-center gap-3 mb-8">
             <Image src="/logo.png" alt="Logo" width={44} height={44} className="rounded-xl" />
             <div>
-              <h2 className="text-2xl font-bold text-zinc-800">Bienvenue 👋</h2>
+              <h2 className="text-2xl font-bold text-zinc-800">Bienvenue à ReaddlyTech</h2>
               <p className="text-sm text-zinc-500">Connectez vous à votre espace</p>
             </div>
           </div>
