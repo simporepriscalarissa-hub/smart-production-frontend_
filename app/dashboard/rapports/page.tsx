@@ -11,10 +11,10 @@ import {
 import { Download, TrendingUp, Package, CheckCircle, XCircle, FileText } from 'lucide-react'
 
 interface OEE {
-  oee: string
-  qualite: string
-  disponibilite: string
-  performance: string
+  oee: number
+  qualite: number
+  disponibilite: number
+  performance: number
   totalProduit: number
   totalNonConforme: number
 }
@@ -207,7 +207,7 @@ export default function Rapports() {
                 <p className="text-xs text-blue-500 uppercase tracking-wide font-semibold">OEE Global</p>
                 <TrendingUp size={18} className="text-blue-600" />
               </div>
-              <p className="text-3xl font-bold text-blue-700">{oee?.oee ?? '—'}</p>
+              <p className="text-3xl font-bold text-blue-700">{oee?.oee != null ? `${oee.oee}%` : '—'}</p>
             </CardContent>
           </Card>
 
@@ -217,7 +217,7 @@ export default function Rapports() {
                 <p className="text-xs text-zinc-500 uppercase tracking-wide font-semibold">Total produit</p>
                 <Package size={18} className="text-zinc-600" />
               </div>
-              <p className="text-3xl font-bold text-zinc-800">{oee?.totalProduit ?? '—'}</p>
+              <p className="text-3xl font-bold text-zinc-800">{productions.reduce((s, p) => s + p.quantiteProduite, 0)}</p>
             </CardContent>
           </Card>
 
@@ -227,7 +227,7 @@ export default function Rapports() {
                 <p className="text-xs text-emerald-500 uppercase tracking-wide font-semibold">Qualité</p>
                 <CheckCircle size={18} className="text-emerald-600" />
               </div>
-              <p className="text-3xl font-bold text-emerald-700">{oee?.qualite ?? '—'}</p>
+              <p className="text-3xl font-bold text-emerald-700">{oee?.qualite != null ? `${oee.qualite}%` : '—'}</p>
             </CardContent>
           </Card>
 
@@ -237,7 +237,7 @@ export default function Rapports() {
                 <p className="text-xs text-red-500 uppercase tracking-wide font-semibold">Non conformes</p>
                 <XCircle size={18} className="text-red-600" />
               </div>
-              <p className="text-3xl font-bold text-red-600">{oee?.totalNonConforme ?? '—'}</p>
+              <p className="text-3xl font-bold text-red-600">{productions.reduce((s, p) => s + p.quantiteNonConforme, 0)}</p>
             </CardContent>
           </Card>
         </div>
