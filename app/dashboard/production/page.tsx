@@ -23,6 +23,12 @@ interface Ouvrier {
   departement: string
 }
 
+interface Reference {
+  id: number
+  code: string
+  libelle: string
+}
+
 interface User {
   id: number
   nom: string
@@ -60,9 +66,11 @@ function ConfirmModal({ onConfirm, onCancel }: { onConfirm: () => void; onCancel
 export default function Production() {
   const [productions, setProductions] = useState<Production[]>([])
   const [ouvriers, setOuvriers] = useState<Ouvrier[]>([])
+  const [references, setReferences] = useState<Reference[]>([])
   const [showForm, setShowForm] = useState(false)
   const [showFormNonConforme, setShowFormNonConforme] = useState(false)
   const [message, setMessage] = useState('')
+  const [erreur, setErreur] = useState('')
   const [user, setUser] = useState<User | null>(null)
   const [confirmId, setConfirmId] = useState<number | null>(null)
   const [form, setForm] = useState({
@@ -90,37 +98,50 @@ export default function Production() {
 
   const fetchData = async () => {
     try {
-      const [prodRes, ouvrierRes] = await Promise.all([
+      const [prodRes, ouvrierRes, refRes] = await Promise.all([
         axios.get('/production'),
         axios.get('/ouvriers'),
+        axios.get('/references'),
       ])
       setProductions(prodRes.data)
       setOuvriers(ouvrierRes.data)
+      setReferences(refRes.data)
     } catch (err) {
       console.log('Erreur:', err)
     }
   }
 
   const ajouterProduction = async () => {
+    if (!form.ouvrierId || !form.reference || !form.quantiteProduite) {
+      setErreur('Veuillez remplir tous les champs obligatoires.')
+      return
+    }
+    setErreur('')
     try {
       await axios.post('/production', {
         ouvrierId: parseInt(form.ouvrierId),
         referenceCode: form.reference,
         quantiteProduite: parseInt(form.quantiteProduite),
-        quantiteConforme: parseInt(form.quantiteConforme),
-        quantiteNonConforme: parseInt(form.quantiteNonConforme),
+        quantiteConforme: parseInt(form.quantiteConforme) || 0,
+        quantiteNonConforme: parseInt(form.quantiteNonConforme) || 0,
       })
       setMessage('Production ajoutée avec succès !')
       setShowForm(false)
       setForm({ ouvrierId: '', reference: '', quantiteProduite: '', quantiteConforme: '', quantiteNonConforme: '' })
       fetchData()
       setTimeout(() => setMessage(''), 3000)
-    } catch (err) {
-      console.log('Erreur:', err)
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
+      setErreur(msg ?? 'Erreur lors de l\'enregistrement. Vérifiez les champs.')
     }
   }
 
   const ajouterNonConforme = async () => {
+    if (!formNonConforme.ouvrierId || !formNonConforme.reference || !formNonConforme.quantiteNonConforme) {
+      setErreur('Veuillez remplir tous les champs obligatoires.')
+      return
+    }
+    setErreur('')
     try {
       const qte = parseInt(formNonConforme.quantiteNonConforme)
       await axios.post('/production', {
@@ -135,8 +156,9 @@ export default function Production() {
       setFormNonConforme({ ouvrierId: '', reference: '', quantiteNonConforme: '', motif: '' })
       fetchData()
       setTimeout(() => setMessage(''), 3000)
-    } catch (err) {
-      console.log('Erreur:', err)
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
+      setErreur(msg ?? 'Erreur lors de l\'enregistrement.')
     }
   }
 
@@ -248,10 +270,17 @@ export default function Production() {
         </Card>
       </div>
 
-      {/* Message */}
+      {/* Message succès */}
       {message && (
         <div className="bg-emerald-50 text-emerald-700 border border-emerald-200 p-4 rounded-xl text-sm flex items-center gap-2">
-          <span>✅</span> {message}
+          <CheckCircle size={16} /> {message}
+        </div>
+      )}
+
+      {/* Message erreur */}
+      {erreur && (
+        <div className="bg-red-50 text-red-700 border border-red-200 p-4 rounded-xl text-sm flex items-center gap-2">
+          <XCircle size={16} /> {erreur}
         </div>
       )}
 
@@ -281,13 +310,16 @@ export default function Production() {
               </div>
               <div className="col-span-2">
                 <label className="text-sm text-zinc-600 mb-1.5 block font-medium">Référence produit</label>
-                <input
-                  type="text"
+                <select
                   value={form.reference}
                   onChange={(e) => setForm({ ...form, reference: e.target.value })}
-                  placeholder="ex: JEAN-001"
                   className="w-full border border-zinc-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                >
+                  <option value="">Sélectionner une référence</option>
+                  {references.map((r) => (
+                    <option key={r.id} value={r.code}>{r.code} - {r.libelle}</option>
+                  ))}
+                </select>
               </div>
               {[
                 { label: 'Quantité produite', key: 'quantiteProduite' },
@@ -344,13 +376,16 @@ export default function Production() {
               </div>
               <div>
                 <label className="text-sm text-zinc-600 mb-1.5 block font-medium">Référence produit</label>
-                <input
-                  type="text"
+                <select
                   value={formNonConforme.reference}
                   onChange={(e) => setFormNonConforme({ ...formNonConforme, reference: e.target.value })}
-                  placeholder="ex: JEAN-001"
                   className="w-full border border-zinc-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
-                />
+                >
+                  <option value="">Sélectionner une référence</option>
+                  {references.map((r) => (
+                    <option key={r.id} value={r.code}>{r.code} - {r.libelle}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="text-sm text-zinc-600 mb-1.5 block font-medium">Nombre de pièces non conformes</label>
