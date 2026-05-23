@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import axios from '@/lib/axios'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { UserPlus, Trash2, Users, Shield, User, AlertTriangle, X, Edit3, Save, Mail, Key } from 'lucide-react'
+import { UserPlus, Trash2, Users, Shield, User, AlertTriangle, X, Edit3, Save, Mail, Key, Eye, EyeOff, Copy, RefreshCw, CheckCircle } from 'lucide-react'
 
 interface UserType {
   id: number
@@ -163,6 +163,11 @@ function ErrorModal({ message, onClose }: { message: string; onClose: () => void
   )
 }
 
+function genPassword() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789@#!'
+  return Array.from({ length: 10 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
+}
+
 export default function UsersPage() {
   const [users, setUsers] = useState<UserType[]>([])
   const [showForm, setShowForm] = useState(false)
@@ -171,6 +176,8 @@ export default function UsersPage() {
   const [confirmId, setConfirmId] = useState<number | null>(null)
   const [editUser, setEditUser] = useState<UserType | null>(null)
   const [errorMsg, setErrorMsg] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [copied, setCopied] = useState(false)
   const [form, setForm] = useState({ nom: '', prenom: '', email: '', password: '', role: 'superviseur', departement: '' })
 
   useEffect(() => {
@@ -188,6 +195,12 @@ export default function UsersPage() {
     } catch (err) {
       console.log('Erreur:', err)
     }
+  }
+
+  const copierMdp = () => {
+    navigator.clipboard.writeText(form.password)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
   }
 
   const ajouterUser = async () => {
@@ -350,7 +363,6 @@ export default function UsersPage() {
                 { label: 'Nom', key: 'nom', type: 'text', placeholder: 'Nom' },
                 { label: 'Prénom', key: 'prenom', type: 'text', placeholder: 'Prénom' },
                 { label: 'Email', key: 'email', type: 'email', placeholder: 'Email pro' },
-                { label: 'Mot de passe', key: 'password', type: 'password', placeholder: 'Mot de passe' },
               ].map(({ label, key, type, placeholder }) => (
                 <div key={key}>
                   <label className="text-[10px] font-black text-zinc-400 uppercase mb-1.5 block tracking-widest">{label}</label>
@@ -363,6 +375,48 @@ export default function UsersPage() {
                   />
                 </div>
               ))}
+
+              {/* Mot de passe avec générateur */}
+              <div className="md:col-span-2 lg:col-span-3">
+                <label className="text-[10px] font-black text-zinc-400 uppercase mb-1.5 block tracking-widest">Mot de passe</label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Key className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={15} />
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={form.password}
+                      onChange={(e) => setForm({ ...form, password: e.target.value })}
+                      placeholder="Mot de passe"
+                      className="w-full border border-zinc-200 rounded-xl pl-10 pr-10 py-2.5 text-sm focus:ring-2 focus:ring-zinc-900 outline-none transition-all font-mono"
+                    />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700">
+                      {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => { setForm({ ...form, password: genPassword() }); setShowPassword(true) }}
+                    className="flex items-center gap-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 px-3 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap"
+                    title="Générer un mot de passe"
+                  >
+                    <RefreshCw size={13} /> Générer
+                  </button>
+                  <button
+                    type="button"
+                    onClick={copierMdp}
+                    disabled={!form.password}
+                    className={`flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${copied ? 'bg-emerald-100 text-emerald-700' : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700'} disabled:opacity-40`}
+                    title="Copier le mot de passe"
+                  >
+                    {copied ? <><CheckCircle size={13} /> Copié !</> : <><Copy size={13} /> Copier</>}
+                  </button>
+                </div>
+                {form.password && showPassword && (
+                  <p className="text-xs text-amber-600 font-medium mt-1.5 flex items-center gap-1">
+                    ⚠ Notez ce mot de passe avant de créer le compte — il ne sera plus visible ensuite.
+                  </p>
+                )}
+              </div>
               <div>
                 <label className="text-[10px] font-black text-zinc-400 uppercase mb-1.5 block tracking-widest">Habilitation</label>
                 <select
